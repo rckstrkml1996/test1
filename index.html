@@ -2,411 +2,615 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeatBase - Магазин Битов</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BeatChain - Маркетплейс битов</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0a0a;
+            background: #0a0e1b;
             color: white;
             min-height: 100vh;
+            overflow-x: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .app-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
         
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(17, 23, 41, 0.95);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .logo {
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-        
-        .play-btn {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(45deg, #00f5ff, #0099ff);
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            color: white;
-        }
-        
-        .search-bar {
-            display: flex;
-            padding: 0 20px 20px;
-            gap: 15px;
-        }
-        
-        .search-input, .input-field {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            padding: 12px 20px;
-            color: white;
-            font-size: 16px;
-        }
-        
-        .search-input::placeholder, .input-field::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        .search-input:focus, .input-field:focus {
-            outline: none;
-            border-color: #00f5ff;
-            box-shadow: 0 0 0 2px rgba(0, 245, 255, 0.2);
-        }
-        
-        .genre-filter {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            padding: 12px 20px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            min-width: 100px;
-        }
-        
-        .beats-list {
-            padding: 0 20px;
-        }
-        
-        .beat-item {
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            margin-bottom: 15px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-            position: relative;
-        }
-        
-        .beat-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(0, 245, 255, 0.3);
-        }
-        
-        .beat-item.playing {
-            background: rgba(0, 245, 255, 0.1);
-            border-color: #00f5ff;
-        }
-        
-        .waveform {
-            width: 60px;
-            height: 40px;
-            display: flex;
-            align-items: end;
-            gap: 2px;
-            margin-right: 15px;
-        }
-        
-        .wave-bar {
-            background: #00f5ff;
-            border-radius: 2px;
-            width: 3px;
-            transition: height 0.3s ease;
-        }
-        
-        .beat-info {
-            flex: 1;
-        }
-        
-        .beat-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-        
-        .beat-producer {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-            margin-bottom: 2px;
-        }
-        
-        .beat-details {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
-        }
-        
-        .beat-play-btn {
-            width: 40px;
-            height: 40px;
-            background: rgba(0, 245, 255, 0.2);
-            border: 1px solid #00f5ff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 16px;
-            margin-right: 15px;
-            transition: all 0.3s ease;
-        }
-        
-        .beat-play-btn:hover {
-            background: rgba(0, 245, 255, 0.3);
-        }
-        
-        .beat-play-btn.playing {
-            background: #00f5ff;
-            color: #0a0a0a;
-        }
-        
-        .beat-price {
-            font-size: 20px;
+        .header h1 {
+            font-size: 28px;
             font-weight: 700;
-            color: #00f5ff;
-        }
-        
-        .beat-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-        
-        .beat-modal.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .modal-content {
-            background: rgba(20, 20, 20, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .modal-waveform {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 245, 255, 0.2) 0%, transparent 70%);
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        .modal-waveform::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 2px solid #00f5ff;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1.1); opacity: 0; }
-        }
-        
-        .modal-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        
-        .modal-producer {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-        
-        .modal-genre {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 14px;
             margin-bottom: 20px;
         }
         
-        .tags {
+        .tabs {
             display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
         }
         
-        .tag {
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 5px 12px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-        
-        .buy-button, .action-button {
-            background: linear-gradient(45deg, #00f5ff, #0099ff);
             border: none;
-            border-radius: 25px;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: 600;
-            color: white;
+            border-radius: 20px;
+            padding: 8px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
             cursor: pointer;
-            margin-bottom: 15px;
-            width: 100%;
+            white-space: nowrap;
             transition: all 0.3s ease;
         }
         
-        .buy-button:hover, .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 245, 255, 0.3);
+        .tab.active {
+            background: #3b82f6;
+            color: white;
         }
         
-        .close-button {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            padding: 10px 30px;
-            color: white;
-            cursor: pointer;
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
             width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px 20px;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #3b82f6;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0 15px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .view-all {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .beats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .beat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .beat-card:hover {
+            transform: translateY(-2px);
+            border-color: #3b82f6;
+        }
+        
+        .beat-cover {
+            position: relative;
+            padding-top: 100%;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+        
+        .beat-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .beat-card:hover .beat-play {
+            opacity: 1;
+        }
+        
+        .beat-info {
+            padding: 12px;
+        }
+        
+        .beat-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .beat-artist {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .beatmakers-section {
+            margin-bottom: 30px;
+        }
+        
+        .beatmaker-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .beatmaker-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .beatmaker-rank {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #fbbf24;
+            color: #0a0e1b;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        
+        .beatmaker-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+        
+        .beatmaker-info {
+            flex: 1;
+        }
+        
+        .beatmaker-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .beatmaker-stats {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
         }
         
         .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(20, 20, 20, 0.95);
+            background: rgba(17, 23, 41, 0.95);
             backdrop-filter: blur(10px);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             justify-content: space-around;
-            padding: 15px 0;
-            z-index: 100;
+            padding: 8px 0;
         }
         
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
+            gap: 4px;
+            padding: 8px 20px;
+            color: rgba(255, 255, 255, 0.5);
             cursor: pointer;
             transition: color 0.3s ease;
+            font-size: 12px;
         }
         
         .nav-item.active {
-            color: #00f5ff;
+            color: #3b82f6;
         }
         
-        .nav-item .icon {
-            font-size: 20px;
-            margin-bottom: 5px;
+        .nav-icon {
+            font-size: 22px;
         }
         
-        .container {
-            padding-bottom: 80px;
-        }
-        
-        .section {
+        /* Profile Section */
+        .profile-section {
             display: none;
             padding: 20px;
         }
         
-        .section.active {
+        .profile-section.active {
             display: block;
         }
         
-        .upload-area {
-            border: 2px dashed rgba(0, 245, 255, 0.5);
-            border-radius: 15px;
-            padding: 40px 20px;
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        
+        .profile-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .profile-username {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+        }
+        
+        .profile-type {
+            margin: 30px 0;
+        }
+        
+        .profile-type h3 {
+            font-size: 18px;
             margin-bottom: 20px;
-            background: rgba(0, 245, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .type-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .type-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         
-        .upload-area:hover {
-            background: rgba(0, 245, 255, 0.1);
-            border-color: #00f5ff;
+        .type-option.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
         }
         
-        .upload-icon {
-            font-size: 48px;
-            color: #00f5ff;
-            margin-bottom: 15px;
+        .type-option-title {
+            font-size: 16px;
+            font-weight: 600;
         }
         
-        .stats-card {
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .profile-action {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
             padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-action:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .action-icon {
+            font-size: 24px;
+        }
+        
+        .action-text {
+            flex: 1;
+        }
+        
+        .action-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .action-desc {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        /* Beat Details Modal */
+        .beat-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0a0e1b;
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .beat-modal.active {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            background: rgba(17, 23, 41, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .back-btn {
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .modal-content {
+            padding: 20px;
+        }
+        
+        .beat-details-cover {
+            width: 100%;
+            padding-top: 100%;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            border-radius: 16px;
+            position: relative;
             margin-bottom: 20px;
-            text-align: center;
         }
         
-        .stat-value {
+        .beat-details-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 32px;
-            font-weight: 700;
-            color: #00f5ff;
-            margin-bottom: 5px;
+            cursor: pointer;
         }
         
-        .stat-label {
+        .beat-details-info {
+            margin-bottom: 30px;
+        }
+        
+        .beat-details-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .beat-details-artist {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+        }
+        
+        .beat-stats {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .beat-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             color: rgba(255, 255, 255, 0.7);
             font-size: 14px;
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: rgba(255, 255, 255, 0.5);
+        .beat-actions {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 10px;
+            margin-bottom: 30px;
         }
         
-        .empty-state-icon {
-            font-size: 48px;
+        .download-btn {
+            background: #3b82f6;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 12px;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .price-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .price-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 5px;
+        }
+        
+        .price-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #3b82f6;
             margin-bottom: 15px;
-            opacity: 0.5;
         }
         
-        .upload-form {
-            max-width: 400px;
-            margin: 0 auto;
+        .price-details {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+        
+        .pay-btn {
+            background: #3b82f6;
+            border: none;
+            border-radius: 12px;
+            padding: 18px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        /* License Setup */
+        .license-setup {
+            display: none;
+            padding: 20px;
+        }
+        
+        .license-setup.active {
+            display: block;
+        }
+        
+        .setup-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .setup-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .setup-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+        }
+        
+        .type-selector {
+            margin-bottom: 30px;
+        }
+        
+        .seller-icon {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
         }
         
         .form-group {
@@ -420,865 +624,596 @@
             font-size: 14px;
         }
         
-        .tag-input-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-        
-        .tag-chip {
-            background: rgba(0, 245, 255, 0.2);
-            border: 1px solid #00f5ff;
-            border-radius: 15px;
-            padding: 5px 12px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .tag-chip .remove {
-            cursor: pointer;
-            color: #00f5ff;
-        }
-        
-        .file-info {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .file-icon {
-            font-size: 32px;
-            color: #00f5ff;
-        }
-        
-        .file-details {
-            flex: 1;
-        }
-        
-        .file-name {
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        
-        .file-size {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
-        }
-        
-        .remove-file {
-            cursor: pointer;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 20px;
-        }
-        
-        .audio-preview {
+        .form-input {
             width: 100%;
-            margin-bottom: 20px;
-            filter: invert(1);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px 20px;
+            color: white;
+            font-size: 16px;
         }
         
-        .purchase-item {
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         
-        .purchase-info {
-            flex: 1;
+        .toggle-label {
+            font-size: 16px;
+            font-weight: 600;
         }
         
-        .purchase-date {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
-            margin-top: 5px;
-        }
-        
-        .download-btn {
-            background: rgba(0, 245, 255, 0.2);
-            border: 1px solid #00f5ff;
-            border-radius: 20px;
-            padding: 8px 20px;
-            color: #00f5ff;
+        .toggle {
+            width: 50px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            position: relative;
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
+            transition: background 0.3s ease;
         }
         
-        .download-btn:hover {
-            background: rgba(0, 245, 255, 0.3);
+        .toggle.active {
+            background: #3b82f6;
         }
         
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 245, 255, 0.9);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            z-index: 2000;
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+        .toggle-handle {
+            width: 26px;
+            height: 26px;
+            background: white;
             border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .toggle.active .toggle-handle {
+            transform: translateX(20px);
+        }
+        
+        .settings-expand {
+            text-align: center;
+            margin-top: 20px;
+            color: #3b82f6;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">BEATBASE</div>
-            <button class="play-btn" id="globalPlayBtn" onclick="toggleGlobalPlay()">▶</button>
-        </div>
-        
-        <!-- Catalog Section -->
-        <div class="section active" id="catalogSection">
-            <div class="search-bar">
-                <input type="text" class="search-input" placeholder="Поиск битов..." id="searchInput">
-                <select class="genre-filter" id="genreFilter">
-                    <option value="">Все жанры</option>
-                    <option value="trap">Trap</option>
-                    <option value="drill">Drill</option>
-                    <option value="hip-hop">Hip-Hop</option>
-                    <option value="rnb">R&B</option>
-                    <option value="pop">Pop</option>
-                </select>
-            </div>
-            
-            <div class="beats-list" id="beatsList">
-                <!-- Beats will be populated here -->
-            </div>
-        </div>
-        
-        <!-- Upload Section -->
-        <div class="section" id="uploadSection">
-            <h2 style="margin-bottom: 30px; text-align: center;">Загрузить бит</h2>
-            
-            <div class="upload-form">
-                <input type="file" id="audioFile" accept="audio/*" style="display: none;">
+    <div class="app-container">
+        <!-- Main Content -->
+        <div class="content" id="mainContent">
+            <div class="header">
+                <h1>Главная</h1>
                 
-                <div class="upload-area" id="uploadArea" onclick="document.getElementById('audioFile').click()">
-                    <div class="upload-icon">🎵</div>
-                    <h3>Нажмите для выбора аудиофайла</h3>
-                    <p style="color: rgba(255,255,255,0.6); margin-top: 10px;">MP3, WAV, FLAC • Макс. 50MB</p>
+                <div class="tabs">
+                    <button class="tab active">Все</button>
+                    <button class="tab">Биты</button>
+                    <button class="tab">Битмейкеры</button>
+                    <button class="tab">Киты</button>
+                    <button class="tab">Услуги</button>
                 </div>
                 
-                <div id="filePreview" style="display: none;">
-                    <div class="file-info">
-                        <div class="file-icon">🎵</div>
-                        <div class="file-details">
-                            <div class="file-name" id="fileName"></div>
-                            <div class="file-size" id="fileSize"></div>
-                        </div>
-                        <div class="remove-file" onclick="removeFile()">✕</div>
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="soundcloud">
+                    <button class="search-btn">Найти</button>
+                </div>
+            </div>
+            
+            <div class="section-header">
+                <div class="section-title">
+                    Популярные биты
+                    <span style="color: rgba(255,255,255,0.5);">⏱ 3:36</span>
+                </div>
+                <a href="#" class="view-all">Смотреть все</a>
+            </div>
+            
+            <div class="beats-grid">
+                <div class="beat-card" onclick="openBeatDetails()">
+                    <div class="beat-cover">
+                        <div class="beat-play">▶</div>
                     </div>
-                    <audio class="audio-preview" id="audioPreview" controls></audio>
+                    <div class="beat-info">
+                        <div class="beat-title">springt...</div>
+                        <div class="beat-artist">DAYMON</div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Название бита</label>
-                    <input type="text" class="input-field" id="beatTitle" placeholder="Например: Midnight Dreams">
+                <div class="beat-card">
+                    <div class="beat-cover" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">
+                        <div class="beat-play">▶</div>
+                    </div>
+                    <div class="beat-info">
+                        <div class="beat-title">psyter...</div>
+                        <div class="beat-artist">rrarri</div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Имя продюсера</label>
-                    <input type="text" class="input-field" id="producerName" placeholder="Ваш псевдоним">
+                <div class="beat-card">
+                    <div class="beat-cover" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                        <div class="beat-play">▶</div>
+                    </div>
+                    <div class="beat-info">
+                        <div class="beat-title">dakim...</div>
+                        <div class="beat-artist">ohmy</div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Жанр</label>
-                    <select class="genre-filter" id="beatGenre" style="width: 100%;">
-                        <option value="">Выберите жанр</option>
-                        <option value="trap">Trap</option>
-                        <option value="drill">Drill</option>
-                        <option value="hip-hop">Hip-Hop</option>
-                        <option value="rnb">R&B</option>
-                        <option value="pop">Pop</option>
-                    </select>
+                <div class="beat-card">
+                    <div class="beat-cover" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                        <div class="beat-play">▶</div>
+                    </div>
+                    <div class="beat-info">
+                        <div class="beat-title">CLOU...</div>
+                        <div class="beat-artist">whatmai...</div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label">BPM</label>
-                    <input type="number" class="input-field" id="beatBpm" placeholder="140" min="60" max="200">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Цена ($)</label>
-                    <input type="number" class="input-field" id="beatPrice" placeholder="29" min="1" max="999">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Теги (нажмите Enter для добавления)</label>
-                    <div class="tag-input-container" id="tagContainer"></div>
-                    <input type="text" class="input-field" id="tagInput" placeholder="Добавить тег">
-                </div>
-                
-                <button class="action-button" onclick="uploadBeat()">Опубликовать бит</button>
-            </div>
-        </div>
-        
-        <!-- My Sales Section -->
-        <div class="section" id="salesSection">
-            <h2 style="margin-bottom: 20px;">Мои продажи</h2>
-            
-            <div class="stats-card">
-                <div class="stat-value" id="totalRevenue">$0</div>
-                <div class="stat-label">Общая выручка</div>
             </div>
             
-            <div class="stats-card">
-                <div class="stat-value" id="totalSales">0</div>
-                <div class="stat-label">Продано битов</div>
+            <div class="section-header">
+                <div class="section-title">Популярные битмейкеры</div>
+                <a href="#" class="view-all">Смотреть все</a>
             </div>
             
-            <h3 style="margin: 30px 0 20px; color: rgba(255,255,255,0.8);">История продаж</h3>
-            <div id="salesHistory">
-                <div class="empty-state">
-                    <div class="empty-state-icon">📊</div>
-                    <p>У вас пока нет продаж</p>
+            <div class="beatmakers-section">
+                <div class="beatmaker-card">
+                    <div class="beatmaker-rank">#1</div>
+                    <div class="beatmaker-avatar">🎭</div>
+                    <div class="beatmaker-info">
+                        <div class="beatmaker-name">DAYMON</div>
+                        <div class="beatmaker-stats">245 битов • 12.5K подписчиков</div>
+                    </div>
+                </div>
+                
+                <div class="beatmaker-card">
+                    <div class="beatmaker-avatar" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">😈</div>
+                    <div class="beatmaker-info">
+                        <div class="beatmaker-name">rrarri</div>
+                        <div class="beatmaker-stats">189 битов • 8.7K подписчиков</div>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <!-- My Purchases Section -->
-        <div class="section" id="purchasesSection">
-            <h2 style="margin-bottom: 20px;">Мои покупки</h2>
-            
-            <div class="stats-card">
-                <div class="stat-value" id="totalPurchases">0</div>
-                <div class="stat-label">Купленных битов</div>
+        <!-- Profile Section -->
+        <div class="profile-section" id="profileSection">
+            <div class="profile-header">
+                <div class="profile-avatar">M</div>
+                <div class="profile-name">margaret</div>
+                <div class="profile-username">@nnarga3t</div>
+                <button style="background: none; border: none; color: #3b82f6; margin-top: 10px; cursor: pointer;">
+                    🛒 Меню покупателя
+                </button>
             </div>
             
-            <h3 style="margin: 30px 0 20px; color: rgba(255,255,255,0.8);">Купленные биты</h3>
-            <div id="purchasesList">
-                <div class="empty-state">
-                    <div class="empty-state-icon">🛍️</div>
-                    <p>У вас пока нет покупок</p>
+            <div class="profile-type">
+                <h3>Собираетесь продавать на BeatChain?</h3>
+                <p style="color: rgba(255,255,255,0.6); margin-bottom: 20px;">
+                    Присоединяйтесь к рядам продавцов и выставляйте свои товары!
+                </p>
+                
+                <div class="profile-actions">
+                    <div class="profile-action" onclick="showLicenseSetup()">
+                        <div class="action-icon">👤</div>
+                        <div class="action-text">
+                            <div class="action-title">Добавить профиль продавца</div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-action">
+                        <div class="action-icon">➕</div>
+                        <div class="action-text">
+                            <div class="action-title">Загрузить бит</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid #3b82f6; border-radius: 16px; padding: 20px; text-align: center;">
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">
+                        Тариф Based
+                    </div>
+                    <div style="color: rgba(255,255,255,0.6); font-size: 14px;">
+                        Получить больше возможностей
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; text-align: center;">
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">
+                        Бонусы 🎁
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Beat Modal -->
-    <div class="beat-modal" id="beatModal">
-        <div class="modal-content">
-            <div class="modal-waveform">
-                <div style="font-size: 40px;">🎵</div>
+        
+        <!-- License Setup -->
+        <div class="license-setup" id="licenseSetup">
+            <div class="setup-header">
+                <h2 class="setup-title">Настройка лицензий</h2>
+                <p class="setup-subtitle">Что вы хотите продавать?</p>
             </div>
-            <div class="modal-title" id="modalTitle">Nebula</div>
-            <div class="modal-producer" id="modalProducer">Metro</div>
-            <div class="modal-genre" id="modalGenre">Trap</div>
-            <div class="tags" id="modalTags">
-                <span class="tag">atmospheric</span>
-                <span class="tag">dark</span>
-                <span class="tag">trap</span>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <div style="color: rgba(255,255,255,0.5); font-size: 14px; margin-bottom: 10px;">
-                    <span id="modalBpm">140 BPM</span> • <span id="modalDuration">2:30</span>
+            
+            <div class="type-selector">
+                <div class="type-options">
+                    <div class="type-option active">
+                        <div class="type-option-title">Биты, киты, услуги</div>
+                    </div>
+                    <div class="type-option">
+                        <div class="type-option-title">Услуги, киты</div>
+                    </div>
                 </div>
-                <button class="play-btn" onclick="playPreview()" style="margin: 0 auto; width: 60px; height: 60px; font-size: 24px;">▶</button>
             </div>
-            <button class="buy-button" id="modalBuyBtn" onclick="purchaseBeat()">Купить $29</button>
-            <button class="close-button" onclick="closeModal()">Закрыть</button>
+            
+            <div class="seller-icon">🎵</div>
+            
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Ник битмейкера</label>
+                    <input type="text" class="form-input" placeholder="Введите ваш ник">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" placeholder="example@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">ФИО</label>
+                    <input type="text" class="form-input" placeholder="Иванов Иван Иванович">
+                </div>
+                
+                <div class="toggle-container">
+                    <div class="toggle-label">MP3</div>
+                    <div class="toggle active" onclick="toggleSwitch(this)">
+                        <div class="toggle-handle"></div>
+                    </div>
+                </div>
+                
+                <div class="settings-expand">
+                    Дополнительные настройки ˅
+                </div>
+            </form>
+        </div>
+        
+        <!-- Beat Details Modal -->
+        <div class="beat-modal" id="beatModal">
+            <div class="modal-header">
+                <div class="back-btn" onclick="closeBeatDetails()">←</div>
+                <div style="flex: 1; font-size: 18px; font-weight: 600;">the dark time of the day</div>
+            </div>
+            
+            <div class="modal-content">
+                <div class="beat-details-cover">
+                    <div class="beat-details-play">▶</div>
+                </div>
+                
+                <div class="beat-details-info">
+                    <h2 class="beat-details-title">the dark time of the day</h2>
+                    <div class="beat-details-artist">
+                        <span style="color: rgba(255,255,255,0.5);">👤</span> DAYMON ›
+                    </div>
+                </div>
+                
+                <div class="beat-stats">
+                    <div class="beat-stat">
+                        <span>🎵</span> 3
+                    </div>
+                    <div class="beat-stat">
+                        <span>❤️</span> 1
+                    </div>
+                    <div class="beat-stat">
+                        <span>⬇️</span> 1
+                    </div>
+                </div>
+                
+                <div class="beat-actions">
+                    <button class="download-btn">
+                        <span>⬇️</span> Скачать
+                    </button>
+                    <button class="action-btn">❤️</button>
+                    <button class="action-btn">🔗</button>
+                    <button class="action-btn">🔗</button>
+                </div>
+                
+                <div class="price-section">
+                    <div class="price-label">Цена</div>
+                    <div class="price-value">1600 ₽</div>
+                    
+                    <div class="price-details">
+                        <div style="margin-bottom: 10px;">
+                            <strong>BPM:</strong> 115<br>
+                            <strong>Тональность:</strong> C#min<br>
+                            <strong>Детюн:</strong> -
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            Базовая лицензия для личного использования
+                        </div>
+                        
+                        <div style="opacity: 0.8;">
+                            ✓ Коммерческое использование<br>
+                            ✓ Формат MP3 320kbps<br>
+                            ✓ Лимит аудио: 100000 прослушиваний<br>
+                            ✓ Лимит видео: без ограничений
+                        </div>
+                    </div>
+                    
+                    <button class="pay-btn">Перейти к оплате за 1600 ₽</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showSection('home')">
+                <div class="nav-icon">🏠</div>
+                <div>Главная</div>
+            </div>
+            <div class="nav-item" onclick="showSection('favorites')">
+                <div class="nav-icon">❤️</div>
+                <div>Избранное</div>
+            </div>
+            <div class="nav-item" onclick="showSection('upload')">
+                <div class="nav-icon">➕</div>
+                <div>Загрузить</div>
+            </div>
+            <div class="nav-item" onclick="showSection('subscriptions')">
+                <div class="nav-icon">👥</div>
+                <div>Подписки</div>
+            </div>
+            <div class="nav-item" onclick="showSection('profile')">
+                <div class="nav-icon">👤</div>
+                <div>Профиль</div>
+            </div>
         </div>
     </div>
-    
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="showSection('catalog')">
-            <div class="icon">🎵</div>
-            <div>Каталог</div>
-        </div>
-        <div class="nav-item" onclick="showSection('sales')">
-            <div class="icon">💰</div>
-            <div>Продажи</div>
-        </div>
-        <div class="nav-item" onclick="showSection('purchases')">
-            <div class="icon">🛒</div>
-            <div>Покупки</div>
-        </div>
-        <div class="nav-item" onclick="showSection('upload')">
-            <div class="icon">⬆️</div>
-            <div>Загрузить</div>
-        </div>
-    </div>
-    
-    <!-- Notification -->
-    <div class="notification" id="notification"></div>
 
     <script>
         // Initialize Telegram Web App
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-        
-        // Global state
-        let currentlyPlaying = null;
-        let currentBeatId = null;
-        let uploadedFile = null;
-        let tags = [];
-        
-        // Local storage keys
-        const STORAGE_KEYS = {
-            BEATS: 'beatbase_beats',
-            PURCHASES: 'beatbase_purchases',
-            SALES: 'beatbase_sales',
-            USER_BEATS: 'beatbase_user_beats'
-        };
-        
-        // Initialize data
-        let beats = JSON.parse(localStorage.getItem(STORAGE_KEYS.BEATS)) || [
-            {
-                id: 1,
-                title: "Nebula",
-                producer: "Metro",
-                genre: "trap",
-                bpm: 140,
-                duration: "2:30",
-                price: 29,
-                tags: ["atmospheric", "dark", "trap"],
-                plays: 0,
-                userId: "default"
-            },
-            {
-                id: 2,
-                title: "Eclipse",
-                producer: "Harmony",
-                genre: "drill",
-                bpm: 123,
-                duration: "3:15",
-                price: 25,
-                tags: ["hard", "drill", "uk"],
-                plays: 0,
-                userId: "default"
-            },
-            {
-                id: 3,
-                title: "Dreamscape",
-                producer: "Soundwave",
-                genre: "rnb",
-                bpm: 110,
-                duration: "2:45",
-                price: 35,
-                tags: ["smooth", "rnb", "chill"],
-                plays: 0,
-                userId: "default"
-            },
-            {
-                id: 4,
-                title: "Ascension",
-                producer: "Rhythmix",
-                genre: "hip-hop",
-                bpm: 150,
-                duration: "3:00",
-                price: 40,
-                tags: ["energetic", "hip-hop", "boom-bap"],
-                plays: 0,
-                userId: "default"
-            },
-            {
-                id: 5,
-                title: "Midnight",
-                producer: "DarkBeats",
-                genre: "trap",
-                bpm: 135,
-                duration: "2:20",
-                price: 32,
-                tags: ["dark", "trap", "heavy"],
-                plays: 0,
-                userId: "default"
+        let tg = null;
+        try {
+            tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            
+            // Prevent viewport changes
+            const viewport = document.querySelector('meta[name="viewport"]');
+            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            
+            // Lock orientation if possible
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('portrait').catch(() => {});
             }
-        ];
-        
-        let purchases = JSON.parse(localStorage.getItem(STORAGE_KEYS.PURCHASES)) || [];
-        let sales = JSON.parse(localStorage.getItem(STORAGE_KEYS.SALES)) || [];
-        
-        // Save initial data
-        saveData();
-        
-        function saveData() {
-            localStorage.setItem(STORAGE_KEYS.BEATS, JSON.stringify(beats));
-            localStorage.setItem(STORAGE_KEYS.PURCHASES, JSON.stringify(purchases));
-            localStorage.setItem(STORAGE_KEYS.SALES, JSON.stringify(sales));
+        } catch (e) {
+            console.log('Running outside Telegram');
         }
         
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.style.background = type === 'error' ? 'rgba(255, 50, 50, 0.9)' : 'rgba(0, 245, 255, 0.9)';
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
+        // Prevent zooming
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
         
-        function renderBeats(beatsToRender = beats) {
-            const beatsList = document.getElementById('beatsList');
-            
-            if (beatsToRender.length === 0) {
-                beatsList.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🎵</div>
-                        <p>Биты не найдены</p>
-                    </div>
-                `;
-                return;
+        document.addEventListener('touchmove', function(e) {
+            if (e.scale !== 1) {
+                e.preventDefault();
             }
-            
-            beatsList.innerHTML = beatsToRender.map(beat => `
-                <div class="beat-item" onclick="openBeatModal(${beat.id})">
-                    <div class="waveform">
-                        ${[...Array(8)].map(() => `<div class="wave-bar" style="height: ${Math.random() * 30 + 10}px;"></div>`).join('')}
-                    </div>
-                    <div class="beat-info">
-                        <div class="beat-title">${beat.title}</div>
-                        <div class="beat-producer">${beat.producer}</div>
-                        <div class="beat-details">${beat.bpm} BPM • ${beat.duration}</div>
-                    </div>
-                    <button class="beat-play-btn" onclick="event.stopPropagation(); toggleBeatPlay(${beat.id})">
-                        <span id="playIcon${beat.id}">▶</span>
-                    </button>
-                    <div class="beat-price">${beat.price}</div>
-                </div>
-            `).join('');
-        }
+        }, { passive: false });
         
-        function toggleBeatPlay(beatId) {
-            const playIcon = document.getElementById(`playIcon${beatId}`);
-            
-            if (currentlyPlaying === beatId) {
-                playIcon.textContent = '▶';
-                currentlyPlaying = null;
-                showNotification('Остановлено');
-            } else {
-                // Stop any currently playing beat
-                if (currentlyPlaying) {
-                    document.getElementById(`playIcon${currentlyPlaying}`).textContent = '▶';
-                }
-                
-                playIcon.textContent = '⏸';
-                currentlyPlaying = beatId;
-                
-                // Update play count
-                const beat = beats.find(b => b.id === beatId);
-                if (beat) {
-                    beat.plays++;
-                    saveData();
-                }
-                
-                showNotification('Воспроизведение: ' + beats.find(b => b.id === beatId).title);
-            }
-            
-            tg.HapticFeedback.impactOccurred('light');
-        }
+        // State management
+        let currentSection = 'home';
+        let currentTab = 'all';
         
-        function openBeatModal(beatId) {
-            const beat = beats.find(b => b.id === beatId);
-            if (!beat) return;
-            
-            currentBeatId = beatId;
-            
-            document.getElementById('modalTitle').textContent = beat.title;
-            document.getElementById('modalProducer').textContent = beat.producer;
-            document.getElementById('modalGenre').textContent = beat.genre.charAt(0).toUpperCase() + beat.genre.slice(1);
-            document.getElementById('modalBpm').textContent = beat.bpm + ' BPM';
-            document.getElementById('modalDuration').textContent = beat.duration;
-            document.getElementById('modalTags').innerHTML = beat.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
-            document.getElementById('modalBuyBtn').textContent = `Купить ${beat.price}`;
-            
-            document.getElementById('beatModal').classList.add('active');
-            tg.HapticFeedback.impactOccurred('light');
-        }
-        
-        function closeModal() {
-            document.getElementById('beatModal').classList.remove('active');
-            currentBeatId = null;
-        }
-        
-        function playPreview() {
-            showNotification('Превью воспроизводится');
-            tg.HapticFeedback.impactOccurred('medium');
-        }
-        
-        function purchaseBeat() {
-            if (!currentBeatId) return;
-            
-            const beat = beats.find(b => b.id === currentBeatId);
-            if (!beat) return;
-            
-            // Check if already purchased
-            if (purchases.some(p => p.beatId === currentBeatId)) {
-                showNotification('Вы уже купили этот бит', 'error');
-                return;
-            }
-            
-            // Add to purchases
-            const purchase = {
-                id: Date.now(),
-                beatId: currentBeatId,
-                title: beat.title,
-                producer: beat.producer,
-                price: beat.price,
-                date: new Date().toISOString(),
-                userId: tg.initDataUnsafe?.user?.id || 'demo'
-            };
-            
-            purchases.push(purchase);
-            
-            // Add to sales if it's someone else's beat
-            if (beat.userId !== (tg.initDataUnsafe?.user?.id || 'demo')) {
-                sales.push({
-                    ...purchase,
-                    sellerId: beat.userId
-                });
-            }
-            
-            saveData();
-            updateStats();
-            
-            // Send data to bot
-            const purchaseData = {
-                action: 'purchase',
-                beatId: currentBeatId,
-                title: beat.title,
-                producer: beat.producer,
-                price: beat.price,
-                timestamp: new Date().toISOString()
-            };
-            
-            tg.sendData(JSON.stringify(purchaseData));
-            
-            showNotification(`Бит "${beat.title}" успешно куплен за ${beat.price}!`);
-            tg.HapticFeedback.notificationOccurred('success');
-            
-            closeModal();
-            renderPurchases();
-        }
-        
+        // Navigation
         function showSection(section) {
             // Hide all sections
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('profileSection').classList.remove('active');
+            document.getElementById('licenseSetup').classList.remove('active');
             
-            // Remove active class from all nav items
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            // Remove active class from nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
             
             // Show selected section
-            document.getElementById(section + 'Section').classList.add('active');
-            
-            // Add active class to clicked nav item
-            event.target.closest('.nav-item').classList.add('active');
-            
-            // Update stats if needed
-            if (section === 'sales' || section === 'purchases') {
-                updateStats();
+            switch(section) {
+                case 'home':
+                    document.getElementById('mainContent').style.display = 'block';
+                    break;
+                case 'profile':
+                    document.getElementById('profileSection').classList.add('active');
+                    break;
+                case 'favorites':
+                case 'upload':
+                case 'subscriptions':
+                    // Show placeholder
+                    alert('Раздел в разработке');
+                    document.getElementById('mainContent').style.display = 'block';
+                    section = 'home';
+                    break;
             }
             
-            tg.HapticFeedback.impactOccurred('light');
-        }
-        
-        function toggleGlobalPlay() {
-            const playBtn = document.getElementById('globalPlayBtn');
-            if (currentlyPlaying === 'global') {
-                playBtn.innerHTML = '▶';
-                currentlyPlaying = null;
-                showNotification('Воспроизведение остановлено');
-            } else {
-                playBtn.innerHTML = '⏸';
-                currentlyPlaying = 'global';
-                showNotification('Воспроизведение всех битов');
+            // Update active nav item
+            const navItems = document.querySelectorAll('.nav-item');
+            const sectionIndex = section === 'home' ? 0 : section === 'favorites' ? 1 : section === 'upload' ? 2 : section === 'subscriptions' ? 3 : 4;
+            navItems[sectionIndex].classList.add('active');
+            
+            currentSection = section;
+            
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
             }
-            tg.HapticFeedback.impactOccurred('medium');
         }
         
-        // Upload functionality
-        document.getElementById('audioFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            // Check file size (50MB limit)
-            if (file.size > 50 * 1024 * 1024) {
-                showNotification('Файл слишком большой. Максимум 50MB', 'error');
-                return;
-            }
-            
-            uploadedFile = file;
-            
-            // Show file preview
-            document.getElementById('uploadArea').style.display = 'none';
-            document.getElementById('filePreview').style.display = 'block';
-            document.getElementById('fileName').textContent = file.name;
-            document.getElementById('fileSize').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
-            
-            // Create preview URL
-            const url = URL.createObjectURL(file);
-            document.getElementById('audioPreview').src = url;
-        });
-        
-        function removeFile() {
-            uploadedFile = null;
-            document.getElementById('audioFile').value = '';
-            document.getElementById('uploadArea').style.display = 'block';
-            document.getElementById('filePreview').style.display = 'none';
-            document.getElementById('audioPreview').src = '';
-        }
-        
-        // Tag functionality
-        document.getElementById('tagInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const tag = e.target.value.trim().toLowerCase();
-                if (tag && !tags.includes(tag) && tags.length < 5) {
-                    tags.push(tag);
-                    renderTags();
-                    e.target.value = '';
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                if (tg && tg.HapticFeedback) {
+                    tg.HapticFeedback.impactOccurred('light');
                 }
-            }
+            });
         });
         
-        function renderTags() {
-            const container = document.getElementById('tagContainer');
-            container.innerHTML = tags.map(tag => `
-                <div class="tag-chip">
-                    ${tag}
-                    <span class="remove" onclick="removeTag('${tag}')">✕</span>
-                </div>
-            `).join('');
-        }
-        
-        function removeTag(tag) {
-            tags = tags.filter(t => t !== tag);
-            renderTags();
-        }
-        
-        function uploadBeat() {
-            // Validate form
-            const title = document.getElementById('beatTitle').value.trim();
-            const producer = document.getElementById('producerName').value.trim();
-            const genre = document.getElementById('beatGenre').value;
-            const bpm = parseInt(document.getElementById('beatBpm').value);
-            const price = parseInt(document.getElementById('beatPrice').value);
+        // Beat details
+        function openBeatDetails() {
+            document.getElementById('beatModal').classList.add('active');
             
-            if (!uploadedFile) {
-                showNotification('Пожалуйста, выберите аудиофайл', 'error');
-                return;
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
             }
-            
-            if (!title || !producer || !genre || !bpm || !price) {
-                showNotification('Пожалуйста, заполните все поля', 'error');
-                return;
-            }
-            
-            if (tags.length === 0) {
-                showNotification('Добавьте хотя бы один тег', 'error');
-                return;
-            }
-            
-            // Create new beat
-            const newBeat = {
-                id: Date.now(),
-                title,
-                producer,
-                genre,
-                bpm,
-                duration: "2:30", // Would be calculated from actual audio
-                price,
-                tags,
-                plays: 0,
-                userId: tg.initDataUnsafe?.user?.id || 'demo',
-                uploadDate: new Date().toISOString()
-            };
-            
-            beats.unshift(newBeat);
-            saveData();
-            
-            // Send data to bot
-            const uploadData = {
-                action: 'upload',
-                beat: newBeat,
-                timestamp: new Date().toISOString()
-            };
-            
-            tg.sendData(JSON.stringify(uploadData));
-            
-            showNotification('Бит успешно загружен!');
-            tg.HapticFeedback.notificationOccurred('success');
-            
-            // Reset form
-            document.getElementById('beatTitle').value = '';
-            document.getElementById('producerName').value = '';
-            document.getElementById('beatGenre').value = '';
-            document.getElementById('beatBpm').value = '';
-            document.getElementById('beatPrice').value = '';
-            tags = [];
-            renderTags();
-            removeFile();
-            
-            // Switch to catalog
-            showSection('catalog');
-            renderBeats();
         }
         
-        function updateStats() {
-            // Update purchases
-            const userPurchases = purchases.filter(p => p.userId === (tg.initDataUnsafe?.user?.id || 'demo'));
-            document.getElementById('totalPurchases').textContent = userPurchases.length;
+        function closeBeatDetails() {
+            document.getElementById('beatModal').classList.remove('active');
             
-            // Update sales
-            const userSales = sales.filter(s => s.sellerId === (tg.initDataUnsafe?.user?.id || 'demo'));
-            const totalRevenue = userSales.reduce((sum, sale) => sum + sale.price, 0);
-            document.getElementById('totalSales').textContent = userSales.length;
-            document.getElementById('totalRevenue').textContent = ' + totalRevenue;
-            
-            renderPurchases();
-            renderSales();
-        }
-        
-        function renderPurchases() {
-            const userPurchases = purchases.filter(p => p.userId === (tg.initDataUnsafe?.user?.id || 'demo'));
-            const container = document.getElementById('purchasesList');
-            
-            if (userPurchases.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🛍️</div>
-                        <p>У вас пока нет покупок</p>
-                    </div>
-                `;
-                return;
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
             }
-            
-            container.innerHTML = userPurchases.map(purchase => `
-                <div class="purchase-item">
-                    <div class="purchase-info">
-                        <div class="beat-title">${purchase.title}</div>
-                        <div class="beat-producer">${purchase.producer}</div>
-                        <div class="purchase-date">Куплено: ${new Date(purchase.date).toLocaleDateString('ru')}</div>
-                    </div>
-                    <button class="download-btn" onclick="downloadBeat(${purchase.beatId})">
-                        Скачать
-                    </button>
-                </div>
-            `).join('');
         }
         
-        function renderSales() {
-            const userSales = sales.filter(s => s.sellerId === (tg.initDataUnsafe?.user?.id || 'demo'));
-            const container = document.getElementById('salesHistory');
+        // License setup
+        function showLicenseSetup() {
+            document.getElementById('profileSection').classList.remove('active');
+            document.getElementById('licenseSetup').classList.add('active');
             
-            if (userSales.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📊</div>
-                        <p>У вас пока нет продаж</p>
-                    </div>
-                `;
-                return;
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
             }
-            
-            container.innerHTML = userSales.map(sale => `
-                <div class="purchase-item">
-                    <div class="purchase-info">
-                        <div class="beat-title">${sale.title}</div>
-                        <div class="beat-producer">Покупатель: User${sale.userId.slice(-4)}</div>
-                        <div class="purchase-date">${new Date(sale.date).toLocaleDateString('ru')}</div>
-                    </div>
-                    <div class="beat-price">+${sale.price}</div>
-                </div>
-            `).join('');
         }
         
-        function downloadBeat(beatId) {
-            showNotification('Загрузка началась...');
-            tg.HapticFeedback.notificationOccurred('success');
+        // Toggle switch
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
             
-            // In real app, this would download the actual file
-            setTimeout(() => {
-                showNotification('Бит успешно загружен!');
-            }, 1500);
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
         }
+        
+        // Type options
+        document.querySelectorAll('.type-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                if (tg && tg.HapticFeedback) {
+                    tg.HapticFeedback.impactOccurred('light');
+                }
+            });
+        });
         
         // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase();
-            const filtered = beats.filter(beat => 
-                beat.title.toLowerCase().includes(query) ||
-                beat.producer.toLowerCase().includes(query) ||
-                beat.genre.toLowerCase().includes(query) ||
-                beat.tags.some(tag => tag.toLowerCase().includes(query))
-            );
-            renderBeats(filtered);
-        });
-        
-        // Genre filter
-        document.getElementById('genreFilter').addEventListener('change', function(e) {
-            const genre = e.target.value;
-            const filtered = genre ? beats.filter(beat => beat.genre === genre) : beats;
-            renderBeats(filtered);
-        });
-        
-        // Setup Telegram Web App
-        tg.MainButton.text = "Мой профиль";
-        tg.MainButton.show();
-        tg.MainButton.onClick(() => {
-            const profileData = {
-                action: 'profile',
-                userId: tg.initDataUnsafe?.user?.id || 'demo',
-                username: tg.initDataUnsafe?.user?.username || 'Demo User',
-                totalBeats: beats.filter(b => b.userId === (tg.initDataUnsafe?.user?.id || 'demo')).length,
-                totalPurchases: purchases.filter(p => p.userId === (tg.initDataUnsafe?.user?.id || 'demo')).length,
-                totalSales: sales.filter(s => s.sellerId === (tg.initDataUnsafe?.user?.id || 'demo')).length
-            };
-            tg.sendData(JSON.stringify(profileData));
-        });
-        
-        // Close modal on background click
-        document.getElementById('beatModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
+        document.querySelector('.search-btn').addEventListener('click', function() {
+            const query = document.querySelector('.search-input').value;
+            if (query) {
+                alert(`Поиск: ${query}`);
+            }
+            
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
             }
         });
+        
+        // Download button
+        document.querySelector('.download-btn').addEventListener('click', function() {
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+            alert('Начинается загрузка...');
+        });
+        
+        // Pay button
+        document.querySelector('.pay-btn').addEventListener('click', function() {
+            if (tg && tg.sendData) {
+                const paymentData = {
+                    action: 'purchase',
+                    beatId: 1,
+                    title: 'the dark time of the day',
+                    producer: 'DAYMON',
+                    price: 1600,
+                    currency: 'RUB',
+                    timestamp: new Date().toISOString()
+                };
+                
+                tg.sendData(JSON.stringify(paymentData));
+            } else {
+                alert('Переход к оплате...');
+            }
+            
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('heavy');
+            }
+        });
+        
+        // Action buttons
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (tg && tg.HapticFeedback) {
+                    tg.HapticFeedback.impactOccurred('light');
+                }
+            });
+        });
+        
+        // Profile actions
+        document.querySelectorAll('.profile-action').forEach(action => {
+            action.addEventListener('click', function() {
+                if (tg && tg.HapticFeedback) {
+                    tg.HapticFeedback.impactOccurred('light');
+                }
+            });
+        });
+        
+        // Telegram theme
+        if (tg) {
+            // Set main button
+            tg.MainButton.text = "Поддержка";
+            tg.MainButton.show();
+            tg.MainButton.onClick(() => {
+                window.open('https://t.me/beatchain_support', '_blank');
+            });
+            
+            // Apply theme colors
+            if (tg.themeParams) {
+                const root = document.documentElement;
+                if (tg.themeParams.bg_color) {
+                    root.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color);
+                }
+                if (tg.themeParams.text_color) {
+                    root.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color);
+                }
+            }
+        }
+        
+        // Prevent pull-to-refresh
+        let lastY = 0;
+        document.addEventListener('touchstart', function(e) {
+            lastY = e.touches[0].clientY;
+        }, { passive: false });
+        
+        document.addEventListener('touchmove', function(e) {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const currentY = e.touches[0].clientY;
+            const direction = currentY > lastY ? 'down' : 'up';
+            
+            if (scrollTop === 0 && direction === 'down') {
+                e.preventDefault();
+            }
+            
+            lastY = currentY;
+        }, { passive: false });
         
         // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            renderBeats();
-            updateStats();
-            
-            // Set theme colors
-            if (tg.themeParams) {
-                document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#0a0a0a');
-                document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#ffffff');
-            }
-        });
+        console.log('BeatChain Web App initialized');
     </script>
 </body>
 </html>
