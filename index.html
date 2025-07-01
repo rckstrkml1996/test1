@@ -3,177 +3,686 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мое Mini App</title>
+    <title>Биржа Битов</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
         }
         
         .container {
             max-width: 400px;
             margin: 0 auto;
-        }
-        
-        .card {
-            background: var(--tg-theme-secondary-bg-color, #f8f9fa);
-            border-radius: 12px;
             padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+        
+        .balance-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
         
-        .btn {
-            background: var(--tg-theme-button-color, #0088cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            border-radius: 8px;
-            padding: 12px 24px;
+        .balance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .balance-title {
             font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            margin: 10px 0;
-        }
-        
-        .btn:hover {
             opacity: 0.8;
         }
         
-        .counter {
-            font-size: 48px;
-            text-align: center;
-            margin: 20px 0;
-            color: var(--tg-theme-accent-text-color, #0088cc);
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
-        .user-info {
-            background: var(--tg-theme-hint-color, #999999);
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(180deg);
+        }
+        
+        .balance-amount {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .balance-usd {
+            opacity: 0.7;
+            font-size: 16px;
+        }
+        
+        .price-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
             margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .price-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .current-price {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .price-change {
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .price-change.positive {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        
+        .price-change.negative {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .trading-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .trade-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .trade-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .trade-card.buy {
+            border-left: 4px solid #22c55e;
+        }
+        
+        .trade-card.sell {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .trade-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .trade-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .trade-subtitle {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .input-group {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+        }
+        
+        .input-group.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .input-field {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 12px 15px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+        }
+        
+        .quick-amounts {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .quick-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+        }
+        
+        .action-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+        
+        .buy-btn {
+            background: linear-gradient(45deg, #22c55e, #16a34a);
+            color: white;
+        }
+        
+        .sell-btn {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .cancel-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .transaction-history {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .history-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-type {
+            font-weight: 600;
+        }
+        
+        .transaction-type.buy {
+            color: #22c55e;
+        }
+        
+        .transaction-type.sell {
+            color: #ef4444;
+        }
+        
+        .transaction-amount {
+            font-size: 14px;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎯 Мое Mini App</h1>
+        <div class="header">
+            <h1>⚡ Биржа Битов</h1>
+            <p>Торгуйте битами быстро и безопасно</p>
+        </div>
         
-        <div class="card">
-            <h2>Информация о пользователе</h2>
-            <div class="user-info" id="userInfo">
-                Загрузка...
+        <div class="balance-card">
+            <div class="balance-header">
+                <span class="balance-title">Мой баланс</span>
+                <button class="refresh-btn" onclick="updateBalance()">🔄</button>
+            </div>
+            <div class="balance-amount" id="balance">1,250.00 BITS</div>
+            <div class="balance-usd" id="balanceUsd">≈ $156.25 USD</div>
+        </div>
+        
+        <div class="price-card">
+            <div class="price-header">
+                <div>
+                    <div class="current-price" id="currentPrice">$0.125</div>
+                    <div style="font-size: 14px; opacity: 0.7;">за 1 BIT</div>
+                </div>
+                <div class="price-change positive" id="priceChange">+2.4%</div>
             </div>
         </div>
         
-        <div class="card">
-            <h2>Счетчик</h2>
-            <div class="counter" id="counter">0</div>
-            <button class="btn" onclick="incrementCounter()">Увеличить</button>
-            <button class="btn" onclick="resetCounter()">Сбросить</button>
+        <div class="trading-section">
+            <div class="trade-card buy" onclick="showTradeForm('buy')">
+                <div class="trade-icon">📈</div>
+                <div class="trade-title">Купить</div>
+                <div class="trade-subtitle">Биты</div>
+            </div>
+            <div class="trade-card sell" onclick="showTradeForm('sell')">
+                <div class="trade-icon">📉</div>
+                <div class="trade-title">Продать</div>
+                <div class="trade-subtitle">Биты</div>
+            </div>
         </div>
         
-        <div class="card">
-            <h2>Действия</h2>
-            <button class="btn" onclick="showAlert()">Показать уведомление</button>
-            <button class="btn" onclick="sendData()">Отправить данные боту</button>
-            <button class="btn" onclick="closeApp()">Закрыть приложение</button>
+        <div class="input-group" id="tradeForm">
+            <label class="input-label" id="amountLabel">Количество битов</label>
+            <input type="number" class="input-field" id="amountInput" placeholder="0.00">
+            
+            <div class="quick-amounts">
+                <button class="quick-btn" onclick="setQuickAmount(100)">100</button>
+                <button class="quick-btn" onclick="setQuickAmount(500)">500</button>
+                <button class="quick-btn" onclick="setQuickAmount(1000)">1K</button>
+                <button class="quick-btn" onclick="setQuickAmount('max')">MAX</button>
+            </div>
+            
+            <label class="input-label">Общая стоимость</label>
+            <input type="text" class="input-field" id="totalCost" placeholder="$0.00" readonly>
+            
+            <button class="action-btn" id="confirmBtn" onclick="executeTrade()">Купить биты</button>
+            <button class="action-btn cancel-btn" onclick="hideTradeForm()">Отмена</button>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="todayProfit">+$12.50</div>
+                <div class="stat-label">Прибыль сегодня</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalTrades">23</div>
+                <div class="stat-label">Всего сделок</div>
+            </div>
+        </div>
+        
+        <div class="transaction-history">
+            <div class="history-header">История транзакций</div>
+            <div id="transactionList">
+                <div class="transaction-item">
+                    <div>
+                        <div class="transaction-type buy">Покупка</div>
+                        <div class="transaction-amount">500 BITS</div>
+                    </div>
+                    <div>
+                        <div>$62.50</div>
+                        <div style="font-size: 12px; opacity: 0.6;">15:30</div>
+                    </div>
+                </div>
+                <div class="transaction-item">
+                    <div>
+                        <div class="transaction-type sell">Продажа</div>
+                        <div class="transaction-amount">300 BITS</div>
+                    </div>
+                    <div>
+                        <div>$37.50</div>
+                        <div style="font-size: 12px; opacity: 0.6;">14:15</div>
+                    </div>
+                </div>
+                <div class="transaction-item">
+                    <div>
+                        <div class="transaction-type buy">Покупка</div>
+                        <div class="transaction-amount">1000 BITS</div>
+                    </div>
+                    <div>
+                        <div>$125.00</div>
+                        <div style="font-size: 12px; opacity: 0.6;">13:45</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Инициализация Telegram Web App
         const tg = window.Telegram.WebApp;
-        
-        // Настройка темы и UI
         tg.ready();
         tg.expand();
         
-        // Счетчик
-        let count = 0;
+        let currentTradeType = '';
+        let balance = 1250;
+        let currentPrice = 0.125;
+        let transactions = [];
         
-        // Отображение информации о пользователе
-        function displayUserInfo() {
-            const user = tg.initDataUnsafe?.user;
-            const userInfoElement = document.getElementById('userInfo');
+        // Инициализация
+        function init() {
+            updatePriceDisplay();
+            updateBalanceDisplay();
             
-            if (user) {
-                userInfoElement.innerHTML = `
-                    <strong>Имя:</strong> ${user.first_name} ${user.last_name || ''}<br>
-                    <strong>Username:</strong> @${user.username || 'не указан'}<br>
-                    <strong>ID:</strong> ${user.id}
-                `;
-            } else {
-                userInfoElement.innerHTML = 'Информация о пользователе недоступна';
-            }
+            // Обновление цены каждые 5 секунд
+            setInterval(updatePrice, 5000);
         }
         
-        // Функции для счетчика
-        function incrementCounter() {
-            count++;
-            document.getElementById('counter').textContent = count;
+        // Показать форму торговли
+        function showTradeForm(type) {
+            currentTradeType = type;
+            const form = document.getElementById('tradeForm');
+            const confirmBtn = document.getElementById('confirmBtn');
+            const amountLabel = document.getElementById('amountLabel');
             
-            // Показываем haptic feedback
+            if (type === 'buy') {
+                confirmBtn.textContent = 'Купить биты';
+                confirmBtn.className = 'action-btn buy-btn';
+                amountLabel.textContent = 'Количество битов для покупки';
+            } else {
+                confirmBtn.textContent = 'Продать биты';
+                confirmBtn.className = 'action-btn sell-btn';
+                amountLabel.textContent = 'Количество битов для продажи';
+            }
+            
+            form.classList.add('active');
+            document.getElementById('amountInput').focus();
+            
             tg.HapticFeedback.impactOccurred('light');
         }
         
-        function resetCounter() {
-            count = 0;
-            document.getElementById('counter').textContent = count;
-            tg.HapticFeedback.impactOccurred('medium');
+        // Скрыть форму торговли
+        function hideTradeForm() {
+            const form = document.getElementById('tradeForm');
+            form.classList.remove('active');
+            document.getElementById('amountInput').value = '';
+            document.getElementById('totalCost').value = '';
         }
         
-        // Показать уведомление
-        function showAlert() {
-            tg.showAlert('Это уведомление из Mini App!');
+        // Установить быстрое количество
+        function setQuickAmount(amount) {
+            const amountInput = document.getElementById('amountInput');
+            
+            if (amount === 'max') {
+                if (currentTradeType === 'sell') {
+                    amountInput.value = balance;
+                } else {
+                    // Для покупки MAX = максимум что можно купить на имеющиеся деньги
+                    // Предполагаем, что у пользователя есть $200 USD
+                    const maxBuyAmount = Math.floor(200 / currentPrice);
+                    amountInput.value = maxBuyAmount;
+                }
+            } else {
+                amountInput.value = amount;
+            }
+            
+            calculateTotal();
+            tg.HapticFeedback.impactOccurred('light');
         }
         
-        // Отправить данные боту
-        function sendData() {
-            const data = {
-                count: count,
-                timestamp: new Date().toISOString(),
-                user_id: tg.initDataUnsafe?.user?.id
+        // Расчет общей стоимости
+        function calculateTotal() {
+            const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+            const total = (amount * currentPrice).toFixed(2);
+            document.getElementById('totalCost').value = `$${total}`;
+        }
+        
+        // Выполнить сделку
+        function executeTrade() {
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            
+            if (!amount || amount <= 0) {
+                tg.showAlert('Введите корректное количество битов');
+                return;
+            }
+            
+            if (currentTradeType === 'sell' && amount > balance) {
+                tg.showAlert('Недостаточно битов для продажи');
+                return;
+            }
+            
+            const totalCost = amount * currentPrice;
+            
+            // Имитация выполнения сделки
+            if (currentTradeType === 'buy') {
+                balance += amount;
+                addTransaction('buy', amount, totalCost);
+                tg.showAlert(`Успешно куплено ${amount} битов за $${totalCost.toFixed(2)}`);
+            } else {
+                balance -= amount;
+                addTransaction('sell', amount, totalCost);
+                tg.showAlert(`Успешно продано ${amount} битов за $${totalCost.toFixed(2)}`);
+            }
+            
+            updateBalanceDisplay();
+            hideTradeForm();
+            
+            tg.HapticFeedback.notificationOccurred('success');
+            
+            // Отправка данных боту
+            const tradeData = {
+                type: currentTradeType,
+                amount: amount,
+                price: currentPrice,
+                total: totalCost,
+                timestamp: new Date().toISOString()
             };
             
-            tg.sendData(JSON.stringify(data));
+            tg.sendData(JSON.stringify(tradeData));
         }
         
-        // Закрыть приложение
-        function closeApp() {
-            tg.close();
+        // Добавить транзакцию в историю
+        function addTransaction(type, amount, cost) {
+            const transaction = {
+                type: type,
+                amount: amount,
+                cost: cost,
+                time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+            };
+            
+            transactions.unshift(transaction);
+            updateTransactionDisplay();
         }
         
-        // Настройка главной кнопки
-        tg.MainButton.text = "Отправить результат";
+        // Обновить отображение транзакций
+        function updateTransactionDisplay() {
+            const list = document.getElementById('transactionList');
+            const displayTransactions = transactions.slice(0, 3); // Показываем только последние 3
+            
+            list.innerHTML = displayTransactions.map(t => `
+                <div class="transaction-item">
+                    <div>
+                        <div class="transaction-type ${t.type}">${t.type === 'buy' ? 'Покупка' : 'Продажа'}</div>
+                        <div class="transaction-amount">${t.amount} BITS</div>
+                    </div>
+                    <div>
+                        <div>$${t.cost.toFixed(2)}</div>
+                        <div style="font-size: 12px; opacity: 0.6;">${t.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Обновить цену
+        function updatePrice() {
+            // Имитация изменения цены
+            const change = (Math.random() - 0.5) * 0.01;
+            currentPrice += change;
+            currentPrice = Math.max(0.1, Math.min(0.2, currentPrice)); // Ограничиваем цену
+            
+            updatePriceDisplay();
+        }
+        
+        // Обновить отображение цены
+        function updatePriceDisplay() {
+            document.getElementById('currentPrice').textContent = `$${currentPrice.toFixed(3)}`;
+            
+            // Имитация изменения процента
+            const changePercent = ((Math.random() - 0.5) * 5).toFixed(1);
+            const changeElement = document.getElementById('priceChange');
+            
+            if (changePercent > 0) {
+                changeElement.textContent = `+${changePercent}%`;
+                changeElement.className = 'price-change positive';
+            } else {
+                changeElement.textContent = `${changePercent}%`;
+                changeElement.className = 'price-change negative';
+            }
+        }
+        
+        // Обновить баланс
+        function updateBalance() {
+            const refreshBtn = document.querySelector('.refresh-btn');
+            refreshBtn.style.transform = 'rotate(360deg)';
+            
+            setTimeout(() => {
+                refreshBtn.style.transform = 'rotate(0deg)';
+                updateBalanceDisplay();
+                tg.HapticFeedback.impactOccurred('light');
+            }, 500);
+        }
+        
+        // Обновить отображение баланса
+        function updateBalanceDisplay() {
+            document.getElementById('balance').textContent = `${balance.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} BITS`;
+            document.getElementById('balanceUsd').textContent = `≈ $${(balance * currentPrice).toFixed(2)} USD`;
+        }
+        
+        // Обработчики событий
+        document.getElementById('amountInput').addEventListener('input', calculateTotal);
+        
+        // Настройка главной кнопки Telegram
+        tg.MainButton.text = "Портфолио";
         tg.MainButton.show();
         tg.MainButton.onClick(() => {
-            sendData();
-        });
-        
-        // Настройка кнопки "Назад"
-        tg.BackButton.show();
-        tg.BackButton.onClick(() => {
-            tg.close();
+            const portfolioData = {
+                balance: balance,
+                usdValue: balance * currentPrice,
+                transactions: transactions.length
+            };
+            tg.sendData(JSON.stringify(portfolioData));
         });
         
         // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
-            displayUserInfo();
-            
-            // Применяем цветовую схему Telegram
-            document.body.style.setProperty('--tg-color-scheme', tg.colorScheme);
-        });
-        
-        // Обработка изменения темы
-        tg.onEvent('themeChanged', function() {
-            document.body.style.setProperty('--tg-color-scheme', tg.colorScheme);
-        });
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
