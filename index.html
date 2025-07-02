@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BeatChain - Маркетплейс битов</title>
+    <title>BeatChain</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -11,46 +11,48 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         :root {
-            --bg-primary: #0a0e1b;
-            --bg-secondary: #111729;
-            --bg-card: rgba(255, 255, 255, 0.05);
-            --bg-hover: rgba(255, 255, 255, 0.08);
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f2a;
+            --bg-tertiary: #242a37;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --bg-card-hover: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.08);
             --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --text-tertiary: rgba(255, 255, 255, 0.5);
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
+            --text-secondary: rgba(255, 255, 255, 0.6);
+            --text-tertiary: rgba(255, 255, 255, 0.4);
+            --accent-blue: #1d9bf0;
+            --accent-blue-hover: #1a8cd8;
+            --accent-green: #00ba7c;
+            --accent-purple: #8b5cf6;
+            --accent-yellow: #ffd93d;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100vh;
+            overflow: hidden;
             position: fixed;
             width: 100%;
-            height: 100%;
         }
         
-        .app-container {
-            width: 100%;
+        .app {
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            position: relative;
         }
         
         /* Splash Screen */
-        .splash-screen {
+        .splash {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             background: var(--bg-primary);
             display: flex;
             align-items: center;
@@ -60,122 +62,188 @@
         }
         
         .splash-logo {
-            font-size: 48px;
-            opacity: 0.3;
-            animation: pulse 2s infinite;
+            width: 80px;
+            height: 80px;
+            position: relative;
         }
         
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.1); opacity: 0.5; }
+        .splash-logo::before {
+            content: '🔗';
+            font-size: 48px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: float 2s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+            50% { transform: translate(-50%, -50%) translateY(-10px); }
         }
         
         /* Header */
         .header {
             background: var(--bg-secondary);
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 20px 0;
+            position: relative;
+            z-index: 10;
         }
         
         .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
-        .header-title {
-            font-size: 24px;
+        .page-title {
+            font-size: 28px;
             font-weight: 700;
+            letter-spacing: -0.5px;
         }
         
-        .header-icon {
-            font-size: 24px;
+        .notification-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .notification-btn:active {
+            transform: scale(0.95);
         }
         
         /* Tabs */
-        .tabs {
+        .tabs-container {
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            padding-bottom: 16px;
             overflow-x: auto;
             scrollbar-width: none;
-            margin-bottom: 15px;
+            -webkit-overflow-scrolling: touch;
         }
         
-        .tabs::-webkit-scrollbar {
+        .tabs-container::-webkit-scrollbar {
             display: none;
         }
         
         .tab {
+            padding: 10px 20px;
             background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 8px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 500;
             color: var(--text-secondary);
-            font-size: 14px;
-            cursor: pointer;
             white-space: nowrap;
-            transition: all 0.3s ease;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
         }
         
         .tab.active {
-            background: var(--accent);
-            border-color: var(--accent);
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
             color: white;
+        }
+        
+        .tab:active {
+            transform: scale(0.98);
         }
         
         /* Search */
         .search-container {
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            padding: 0 20px 20px;
+            background: var(--bg-secondary);
+        }
+        
+        .search-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            pointer-events: none;
         }
         
         .search-input {
-            flex: 1;
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px 20px;
-            color: white;
+            width: 100%;
+            height: 44px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 22px;
+            padding: 0 20px 0 44px;
             font-size: 16px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
         }
         
         .search-input::placeholder {
             color: var(--text-tertiary);
         }
         
-        .search-btn {
-            background: var(--accent);
-            border: none;
-            border-radius: 12px;
-            padding: 12px 30px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s ease;
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: var(--bg-primary);
         }
         
-        .search-btn:hover {
-            background: var(--accent-hover);
+        .search-btn {
+            height: 44px;
+            padding: 0 28px;
+            background: var(--accent-blue);
+            border: none;
+            border-radius: 22px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        
+        .search-btn:active {
+            transform: scale(0.98);
+            background: var(--accent-blue-hover);
         }
         
         /* Content */
         .content {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
             padding-bottom: 80px;
         }
         
+        .content::-webkit-scrollbar {
+            width: 0;
+        }
+        
+        /* Section */
         .section {
-            padding: 20px;
+            padding: 20px 20px 0;
         }
         
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
         
         .section-title {
@@ -183,109 +251,163 @@
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
         
-        .view-all {
+        .section-time {
+            color: var(--text-tertiary);
+            font-size: 16px;
+            font-weight: 400;
+        }
+        
+        .section-link {
             color: var(--text-secondary);
+            font-size: 15px;
             text-decoration: none;
-            font-size: 14px;
+            transition: color 0.2s ease;
         }
         
-        /* Beat Cards */
-        .beats-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        .section-link:active {
+            color: var(--accent-blue);
         }
         
+        /* Beat Card */
         .beat-card {
             background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
         
-        .beat-card:hover {
-            background: var(--bg-hover);
-            transform: translateY(-2px);
+        .beat-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        
+        .beat-card:active {
+            transform: scale(0.98);
+            background: var(--bg-card-hover);
+        }
+        
+        .beat-card:active::before {
+            transform: translateX(100%);
         }
         
         .beat-cover {
             width: 80px;
             height: 80px;
+            border-radius: 16px;
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
+            flex-shrink: 0;
             overflow: hidden;
         }
         
-        .beat-play {
-            width: 40px;
-            height: 40px;
-            background: rgba(0, 0, 0, 0.5);
+        .beat-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .beat-play-btn {
+            position: absolute;
+            width: 36px;
+            height: 36px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 16px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .beat-play-btn:active {
+            transform: scale(0.9);
         }
         
         .beat-info {
             flex: 1;
+            min-width: 0;
         }
         
         .beat-title {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
-        .beat-artist {
+        .beat-badges {
+            display: flex;
+            gap: 6px;
+            margin-left: auto;
+        }
+        
+        .beat-badge {
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+        
+        .beat-badge.verified {
+            color: var(--accent-blue);
+        }
+        
+        .beat-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             color: var(--text-secondary);
             font-size: 14px;
             margin-bottom: 8px;
         }
         
-        .beat-meta {
-            display: flex;
-            gap: 15px;
-            color: var(--text-tertiary);
-            font-size: 12px;
-        }
-        
         .beat-tags {
             display: flex;
             gap: 8px;
-            margin-top: 8px;
             flex-wrap: wrap;
         }
         
         .beat-tag {
             color: var(--text-tertiary);
-            font-size: 12px;
+            font-size: 13px;
         }
         
         .beat-like {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 20px;
             cursor: pointer;
-            color: var(--text-tertiary);
-            transition: color 0.3s ease;
+            transition: all 0.2s ease;
         }
         
-        .beat-like.active {
+        .beat-like:active {
+            transform: scale(0.8);
+        }
+        
+        .beat-like.liked {
             color: #ef4444;
         }
         
@@ -293,45 +415,42 @@
         .beats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            gap: 12px;
+            margin-bottom: 32px;
         }
         
-        .beat-grid-card {
+        .beat-grid-item {
             background: var(--bg-card);
-            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
             overflow: hidden;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
         
-        .beat-grid-card:hover {
-            transform: translateY(-2px);
+        .beat-grid-item:active {
+            transform: scale(0.98);
         }
         
         .beat-grid-cover {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
             position: relative;
-            padding-top: 100%;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            overflow: hidden;
         }
         
         .beat-grid-play {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 50%;
+            inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            background: rgba(0, 0, 0, 0.3);
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
         }
         
-        .beat-grid-card:hover .beat-grid-play {
+        .beat-grid-item:hover .beat-grid-play {
             opacity: 1;
         }
         
@@ -340,7 +459,7 @@
         }
         
         .beat-grid-title {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             margin-bottom: 4px;
             white-space: nowrap;
@@ -349,127 +468,165 @@
         }
         
         .beat-grid-artist {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
-        /* Beatmakers */
+        /* Beatmaker Card */
         .beatmaker-card {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
             padding: 20px;
-            background: var(--bg-card);
-            border-radius: 16px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            margin-bottom: 16px;
             position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
         
-        .beatmaker-card:hover {
-            background: var(--bg-hover);
+        .beatmaker-card:active {
+            transform: scale(0.98);
         }
         
         .beatmaker-rank {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #fbbf24;
+            top: 12px;
+            left: 12px;
+            background: var(--accent-yellow);
             color: var(--bg-primary);
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 12px;
+            padding: 4px 12px;
+            border-radius: 16px;
+        }
+        
+        .beatmaker-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
         
         .beatmaker-avatar {
-            width: 80px;
-            height: 80px;
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
             background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 28px;
+            flex-shrink: 0;
         }
         
         .beatmaker-info {
             flex: 1;
+            min-width: 0;
         }
         
         .beatmaker-name {
             font-size: 18px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
         
         .beatmaker-stats {
             color: var(--text-secondary);
             font-size: 14px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
         
-        .beatmaker-meta {
+        .beatmaker-metrics {
             display: flex;
-            gap: 20px;
-            color: var(--text-tertiary);
-            font-size: 12px;
+            gap: 16px;
         }
         
-        .beatmaker-meta span {
+        .beatmaker-metric {
             display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        /* Bottom Navigation */
-        .bottom-nav {
-            background: var(--bg-secondary);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-        }
-        
-        .nav-item {
-            display: flex;
-            flex-direction: column;
             align-items: center;
             gap: 4px;
-            padding: 8px 16px;
             color: var(--text-tertiary);
-            cursor: pointer;
-            transition: color 0.3s ease;
-            font-size: 12px;
+            font-size: 13px;
         }
         
-        .nav-item.active {
-            color: var(--accent);
+        .beatmaker-featured {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-card);
+            border-radius: 16px;
         }
         
-        .nav-icon {
-            font-size: 22px;
-        }
-        
-        /* Profile Screen */
-        .profile-container {
-            padding: 20px;
-        }
-        
-        .profile-header {
+        .beatmaker-beat {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 12px;
+        }
+        
+        .beatmaker-beat-cover {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .beatmaker-beat-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .beatmaker-beat-title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .beatmaker-beat-meta {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        
+        .beatmaker-more {
+            text-align: center;
+            padding: 12px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            padding: 80px 40px;
+            text-align: center;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.2;
+        }
+        
+        .empty-text {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+        
+        /* Profile */
+        .profile-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--bg-secondary);
+            margin-bottom: 20px;
         }
         
         .profile-avatar {
@@ -481,18 +638,20 @@
             align-items: center;
             justify-content: center;
             font-size: 32px;
-            color: white;
             font-weight: 600;
+            color: white;
+            flex-shrink: 0;
         }
         
         .profile-info {
             flex: 1;
+            min-width: 0;
         }
         
         .profile-name {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
         
         .profile-username {
@@ -500,188 +659,180 @@
             font-size: 16px;
         }
         
-        .profile-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .profile-action-btn {
+        .profile-cart {
+            width: 44px;
+            height: 44px;
             background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 8px 16px;
-            color: white;
-            font-size: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
             cursor: pointer;
-            transition: all 0.3s ease;
         }
         
-        .profile-action-btn:hover {
-            background: var(--bg-hover);
+        .menu-btn {
+            margin: 0 20px 20px;
+            width: calc(100% - 40px);
+            height: 48px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
         
-        .profile-section {
-            margin-bottom: 30px;
-        }
-        
-        .profile-section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
+        .menu-btn:active {
+            transform: scale(0.98);
+            background: var(--bg-card-hover);
         }
         
         .profile-card {
-            background: var(--bg-card);
-            border-radius: 16px;
+            margin: 0 20px 20px;
             padding: 20px;
-            margin-bottom: 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
         }
         
         .profile-card-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         .profile-card-text {
             color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        
+        .profile-actions {
+            margin: 0 20px;
         }
         
         .profile-action {
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 15px;
+            transition: all 0.2s ease;
         }
         
-        .profile-action:hover {
-            background: var(--bg-hover);
+        .profile-action:active {
+            transform: scale(0.98);
+            background: var(--bg-card-hover);
         }
         
-        .action-icon {
+        .profile-action-icon {
             font-size: 24px;
         }
         
-        .action-text {
-            flex: 1;
+        .profile-action-text {
             font-size: 16px;
-        }
-        
-        .tariff-badge {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid var(--accent);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .tariff-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--accent);
-            margin-bottom: 5px;
-        }
-        
-        .tariff-desc {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-        
-        /* Empty States */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-tertiary);
-        }
-        
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-        
-        .empty-text {
-            font-size: 16px;
+            font-weight: 500;
         }
         
         /* Upload Menu */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+        
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
         .upload-menu {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: var(--bg-secondary);
-            border-radius: 20px 20px 0 0;
-            padding: 20px;
+            border-radius: 24px 24px 0 0;
+            padding: 8px 20px 40px;
             transform: translateY(100%);
-            transition: transform 0.3s ease;
-            z-index: 200;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 101;
         }
         
         .upload-menu.active {
             transform: translateY(0);
         }
         
-        .upload-menu-header {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20;
-        }
-        
-        .upload-menu-handle {
+        .menu-handle {
             width: 40px;
             height: 4px;
             background: var(--text-tertiary);
             border-radius: 2px;
+            margin: 12px auto 20px;
         }
         
         .upload-option {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 15px;
+            gap: 16px;
+            padding: 16px;
             background: var(--bg-card);
-            border-radius: 12px;
-            margin-bottom: 10px;
+            border-radius: 16px;
+            margin-bottom: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
         
-        .upload-option:hover {
-            background: var(--bg-hover);
+        .upload-option:active {
+            transform: scale(0.98);
+            background: var(--bg-card-hover);
         }
         
         .upload-option-icon {
-            font-size: 24px;
+            width: 44px;
+            height: 44px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
         }
         
         .upload-option-text {
             font-size: 16px;
+            font-weight: 500;
         }
         
         /* License Setup */
-        .license-container {
-            padding: 20px;
-        }
-        
         .license-header {
+            padding: 20px;
             text-align: center;
-            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            margin-bottom: 20px;
         }
         
         .license-title {
             font-size: 24px;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         .license-subtitle {
@@ -692,82 +843,465 @@
         .type-selector {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 12px;
+            padding: 0 20px;
+            margin-bottom: 32px;
         }
         
         .type-option {
-            background: var(--bg-card);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
             padding: 20px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
             text-align: center;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
         
         .type-option.active {
-            background: rgba(59, 130, 246, 0.1);
-            border-color: var(--accent);
+            background: rgba(29, 155, 240, 0.1);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
         }
         
-        .seller-icon {
+        .seller-avatar {
             width: 120px;
             height: 120px;
-            margin: 20px auto;
-            background: rgba(59, 130, 246, 0.1);
-            border: 2px solid var(--accent);
+            background: rgba(29, 155, 240, 0.1);
+            border: 3px solid var(--accent-blue);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 48px;
+            margin: 32px auto;
         }
         
         .form-group {
+            padding: 0 20px;
             margin-bottom: 20px;
         }
         
         .form-label {
-            display: block;
-            margin-bottom: 8px;
             color: var(--text-secondary);
             font-size: 14px;
+            margin-bottom: 8px;
         }
         
         .form-input {
             width: 100%;
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 48px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 14px 20px;
-            color: white;
+            padding: 0 16px;
             font-size: 16px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
         }
         
-        .form-input::placeholder {
-            color: var(--text-tertiary);
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
         }
         
-        .license-option {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-        
-        .license-option-header {
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            justify-content: space-around;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+            z-index: 50;
         }
         
-        .license-option-title {
-            font-size: 18px;
-            font-weight: 600;
+        .nav-item {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
         }
         
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+            color: var(--text-tertiary);
+            transition: color 0.2s ease;
+        }
+        
+        .nav-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            transition: color 0.2s ease;
+        }
+        
+        .nav-item.active .nav-icon,
+        .nav-item.active .nav-label {
+            color: var(--accent-blue);
+        }
+        
+        .nav-add {
+            width: 56px;
+            height: 56px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(29, 155, 240, 0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .nav-add:active {
+            transform: scale(0.9);
+        }
+        
+        /* Page transitions */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Loading animation */
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--bg-card);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 40px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Splash Screen -->
+        <div class="splash" id="splash">
+            <div class="splash-logo"></div>
+        </div>
+        
+        <!-- Pages -->
+        <div class="page active" id="homePage">
+            <div class="header">
+                <div class="header-top">
+                    <h1 class="page-title">Главная</h1>
+                    <button class="notification-btn">
+                        <span>🔔</span>
+                    </button>
+                </div>
+                
+                <div class="tabs-container">
+                    <div class="tab active" data-filter="all">Все</div>
+                    <div class="tab" data-filter="beats">Биты</div>
+                    <div class="tab" data-filter="beatmakers">Битмейкеры</div>
+                    <div class="tab" data-filter="kits">Киты</div>
+                    <div class="tab" data-filter="services">Услуги</div>
+                </div>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" placeholder="Поиск">
+                </div>
+                <button class="search-btn">Найти</button>
+            </div>
+            
+            <div class="content">
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            Популярные биты
+                            <span class="section-time">⏱ 9:46</span>
+                        </h2>
+                        <a href="#" class="section-link">Смотреть все</a>
+                    </div>
+                    
+                    <div id="beatsList">
+                        <!-- Beats will be loaded here -->
+                    </div>
+                    
+                    <div class="beats-grid" id="beatsGrid">
+                        <!-- Grid beats will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="section" id="beatmakersSection">
+                    <div class="section-header">
+                        <h2 class="section-title">Популярные битмейкеры</h2>
+                        <a href="#" class="section-link">Смотреть все</a>
+                    </div>
+                    
+                    <div id="beatmakersList">
+                        <!-- Beatmakers will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="section" id="newSection" style="display: none;">
+                    <div class="section-header">
+                        <h2 class="section-title">Что нового</h2>
+                    </div>
+                    
+                    <!-- New content banner -->
+                    <div style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-radius: 20px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden;">
+                        <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Стань игроком</h3>
+                        <p style="font-size: 16px; opacity: 0.9; margin-bottom: 16px;">С новым тарифом «Player»</p>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 18px;">🎮</span>
+                            <span style="font-size: 14px; opacity: 0.8;">/beatchainbot</span>
+                        </div>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h2 class="section-title">Набирают обороты</h2>
+                        <a href="#" class="section-link">Смотреть все</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="page" id="favoritesPage">
+            <div class="header">
+                <div class="header-top">
+                    <h1 class="page-title">Избранное</h1>
+                </div>
+            </div>
+            <div class="content">
+                <div class="empty-state">
+                    <div class="empty-icon">❤️</div>
+                    <div class="empty-text">У вас пока нет избранных битов</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="page" id="subscriptionsPage">
+            <div class="header">
+                <div class="header-top">
+                    <h1 class="page-title">Подписки</h1>
+                </div>
+            </div>
+            <div class="content">
+                <div class="empty-state">
+                    <div class="empty-icon">👥</div>
+                    <div class="empty-text">У вас пока нет подписок</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="page" id="profilePage">
+            <div class="header">
+                <div class="header-top">
+                    <h1 class="page-title">Профиль</h1>
+                    <a href="#" style="color: var(--accent-blue); text-decoration: none; font-size: 16px;">💬 Поддержка</a>
+                </div>
+            </div>
+            
+            <div class="profile-header">
+                <div class="profile-avatar">M</div>
+                <div class="profile-info">
+                    <div class="profile-name">Margar3t</div>
+                    <div class="profile-username">@nnarga3t</div>
+                </div>
+                <div class="profile-cart">🛒</div>
+            </div>
+            
+            <button class="menu-btn">
+                <span>☰</span>
+                <span>Меню покупателя</span>
+            </button>
+            
+            <div class="profile-card">
+                <div class="profile-card-title">Собираетесь продавать на BeatChain?</div>
+                <div class="profile-card-text">
+                    Присоединяйтесь к рядам продавцов и выставляйте свои товары!
+                </div>
+            </div>
+            
+            <div class="profile-actions">
+                <div class="profile-action" onclick="showLicenseSetup()">
+                    <div class="profile-action-icon">👤</div>
+                    <div class="profile-action-text">Добавить профиль продавца</div>
+                </div>
+                
+                <div class="profile-action" onclick="toggleUploadMenu()">
+                    <div class="profile-action-icon">➕</div>
+                    <div class="profile-action-text">Загрузить бит</div>
+                </div>
+            </div>
+            
+            <div class="profile-card" style="background: rgba(29, 155, 240, 0.1); border-color: var(--accent-blue);">
+                <div class="profile-card-title" style="color: var(--accent-blue);">Тариф Based</div>
+                <div class="profile-card-text">Получить больше возможностей</div>
+            </div>
+            
+            <div class="profile-card">
+                <div class="profile-card-title">
+                    Бонусы
+                    <span style="float: right;">🎁</span>
+                </div>
+                <div class="profile-card-text">Реферальная система и акции</div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">История покупок <span style="color: var(--text-secondary); font-weight: 400;">0</span></h2>
+                </div>
+                <div class="empty-state" style="padding: 40px;">
+                    <div class="empty-text">У вас пока нет покупок</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="page" id="licensePage" style="padding-bottom: 100px;">
+            <div class="header">
+                <div class="header-top">
+                    <button onclick="closeLicenseSetup()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">←</button>
+                    <h1 class="page-title">Back</h1>
+                </div>
+            </div>
+            
+            <div class="license-header">
+                <h1 class="license-title">Настройка лицензий</h1>
+                <p class="license-subtitle">Что вы хотите продавать?</p>
+            </div>
+            
+            <div class="type-selector">
+                <div class="type-option active" onclick="selectType(this, 'beats')">
+                    Биты, киты,<br>услуги
+                </div>
+                <div class="type-option" onclick="selectType(this, 'services')">
+                    Услуги, киты
+                </div>
+            </div>
+            
+            <div class="seller-avatar" id="sellerAvatar">🎵</div>
+            
+            <div class="form-group">
+                <div class="form-label">Ник битмейкера</div>
+                <input type="text" class="form-input" placeholder="Введите ваш ник">
+            </div>
+            
+            <div class="form-group">
+                <div class="form-label">Email</div>
+                <input type="email" class="form-input" placeholder="example@email.com">
+            </div>
+            
+            <div class="form-group">
+                <div class="form-label">ФИО</div>
+                <input type="text" class="form-input" placeholder="Иванов Иван Иванович">
+            </div>
+            
+            <div class="form-group">
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 18px; font-weight: 500;">MP3</span>
+                        <div class="toggle active" onclick="toggleSwitch(this)">
+                            <div class="toggle-handle"></div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 12px;">
+                        <span style="color: var(--text-secondary); font-size: 14px; cursor: pointer;">Дополнительные настройки ˅</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="padding: 20px;">
+                <button style="width: 100%; height: 56px; background: var(--accent-blue); border: none; border-radius: 16px; color: white; font-size: 18px; font-weight: 600; cursor: pointer;">
+                    Сохранить настройки
+                </button>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showPage('home')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Главная</span>
+            </div>
+            <div class="nav-item" onclick="showPage('favorites')">
+                <span class="nav-icon">❤️</span>
+                <span class="nav-label">Избранное</span>
+            </div>
+            <div class="nav-item" onclick="toggleUploadMenu()">
+                <div class="nav-add">+</div>
+                <span class="nav-label">Загрузить</span>
+            </div>
+            <div class="nav-item" onclick="showPage('subscriptions')">
+                <span class="nav-icon">👥</span>
+                <span class="nav-label">Подписки</span>
+            </div>
+            <div class="nav-item" onclick="showPage('profile')">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Профиль</span>
+            </div>
+        </div>
+        
+        <!-- Upload Menu -->
+        <div class="overlay" id="overlay" onclick="toggleUploadMenu()"></div>
+        <div class="upload-menu" id="uploadMenu">
+            <div class="menu-handle"></div>
+            
+            <div class="upload-option" onclick="selectUploadOption('beat')">
+                <div class="upload-option-icon">➕</div>
+                <div class="upload-option-text">Загрузить один бит</div>
+            </div>
+            
+            <div class="upload-option" onclick="selectUploadOption('bulk')">
+                <div class="upload-option-icon">📁</div>
+                <div class="upload-option-text">Массовая загрузка</div>
+            </div>
+            
+            <div class="upload-option" onclick="selectUploadOption('kit')">
+                <div class="upload-option-icon">🛍️</div>
+                <div class="upload-option-text">Загрузить кит</div>
+            </div>
+            
+            <div class="upload-option" onclick="selectUploadOption('service')">
+                <div class="upload-option-icon">💼</div>
+                <div class="upload-option-text">Менеджер услуг</div>
+            </div>
+            
+            <div class="upload-option" onclick="selectUploadOption('drafts')">
+                <div class="upload-option-icon">📄</div>
+                <div class="upload-option-text">Черновики</div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
         .toggle {
             width: 50px;
             height: 30px;
@@ -779,7 +1313,7 @@
         }
         
         .toggle.active {
-            background: var(--accent);
+            background: var(--accent-blue);
         }
         
         .toggle-handle {
@@ -796,548 +1330,7 @@
         .toggle.active .toggle-handle {
             transform: translateX(20px);
         }
-        
-        .expand-btn {
-            text-align: center;
-            color: var(--accent);
-            cursor: pointer;
-            padding: 10px;
-            font-size: 14px;
-        }
-        
-        .license-details {
-            display: none;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .license-details.active {
-            display: block;
-        }
-        
-        .price-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 10px 15px;
-            color: white;
-            font-size: 16px;
-            width: 100%;
-            margin-bottom: 15px;
-        }
-        
-        .signature-area {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 15px;
-            min-height: 120px;
-            color: white;
-            font-size: 14px;
-            width: 100%;
-            resize: vertical;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        
-        .btn {
-            flex: 1;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-secondary {
-            background: var(--bg-card);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        /* Media Options */
-        .media-options {
-            position: fixed;
-            bottom: 100px;
-            left: 20px;
-            right: 20px;
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 15px;
-            display: none;
-            z-index: 300;
-        }
-        
-        .media-options.active {
-            display: block;
-            animation: slideUp 0.3s ease;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .media-option {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: var(--bg-card);
-            border-radius: 12px;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-        
-        .media-option:last-child {
-            margin-bottom: 0;
-        }
-        
-        /* Loading State */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Overlay */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            z-index: 150;
-        }
-        
-        .overlay.active {
-            display: block;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 360px) {
-            .header-title { font-size: 20px; }
-            .beat-card { padding: 12px; }
-            .beat-cover { width: 60px; height: 60px; }
-        }
     </style>
-</head>
-<body>
-    <div class="app-container">
-        <!-- Splash Screen -->
-        <div class="splash-screen" id="splash">
-            <div class="splash-logo">🔗</div>
-        </div>
-        
-        <!-- Main Content -->
-        <div class="content" id="mainContent">
-            <!-- Home Section -->
-            <div class="section" id="homeSection">
-                <div class="header">
-                    <div class="header-top">
-                        <h1 class="header-title">Главная</h1>
-                        <div class="header-icon">🔔</div>
-                    </div>
-                    
-                    <div class="tabs" id="mainTabs">
-                        <button class="tab active" data-filter="all">Все</button>
-                        <button class="tab" data-filter="beats">Биты</button>
-                        <button class="tab" data-filter="beatmakers">Битмейкеры</button>
-                        <button class="tab" data-filter="kits">Киты</button>
-                        <button class="tab" data-filter="services">Услуги</button>
-                    </div>
-                    
-                    <div class="search-container">
-                        <input type="text" class="search-input" placeholder="Поиск" id="searchInput">
-                        <button class="search-btn">Найти</button>
-                    </div>
-                </div>
-                
-                <!-- Popular Beats -->
-                <div id="popularBeats">
-                    <div class="section-header">
-                        <h2 class="section-title">
-                            Популярные биты
-                            <span style="color: var(--text-tertiary);">⏱ 7:19</span>
-                        </h2>
-                        <a href="#" class="view-all">Смотреть все</a>
-                    </div>
-                    
-                    <div class="beats-list">
-                        <div class="beat-card">
-                            <div class="beat-cover">
-                                <div class="beat-play">▶</div>
-                            </div>
-                            <div class="beat-info">
-                                <div class="beat-title">
-                                    DOUBLE FACE
-                                    <span style="color: var(--text-tertiary);">⬇</span>
-                                    <span style="color: var(--text-tertiary);">senpai⭐</span>
-                                    <span style="color: var(--text-tertiary);">+</span>
-                                </div>
-                                <div class="beat-meta">
-                                    <span>186 BPM</span>
-                                    <span>•</span>
-                                    <span>F#min</span>
-                                    <span>•</span>
-                                    <span>от 1000 ₽</span>
-                                </div>
-                                <div class="beat-tags">
-                                    <span class="beat-tag">#youngmoney</span>
-                                    <span class="beat-tag">#2010s</span>
-                                    <span class="beat-tag">#timl</span>
-                                </div>
-                            </div>
-                            <div class="beat-like">🤍</div>
-                        </div>
-                        
-                        <div class="beat-card">
-                            <div class="beat-cover" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">
-                                <div class="beat-play">▶</div>
-                            </div>
-                            <div class="beat-info">
-                                <div class="beat-title">
-                                    privet
-                                    <span style="color: var(--text-tertiary);">🎸</span>
-                                    <span style="color: var(--text-tertiary);">plus37</span>
-                                    <span style="color: #3b82f6;">✓</span>
-                                </div>
-                                <div class="beat-meta">
-                                    <span>187 BPM</span>
-                                    <span>•</span>
-                                    <span>F#maj</span>
-                                    <span>•</span>
-                                    <span>от 500 ₽</span>
-                                </div>
-                                <div class="beat-tags">
-                                    <span class="beat-tag">#digicore</span>
-                                    <span class="beat-tag">#archivecore</span>
-                                    <span class="beat-tag">#jerk</span>
-                                </div>
-                            </div>
-                            <div class="beat-like">🤍</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Popular Beatmakers -->
-                <div id="popularBeatmakers" style="margin-top: 30px;">
-                    <div class="section-header">
-                        <h2 class="section-title">Популярные битмейкеры</h2>
-                        <a href="#" class="view-all">Смотреть все</a>
-                    </div>
-                    
-                    <div class="beatmaker-card">
-                        <div class="beatmaker-rank">#1</div>
-                        <div class="beatmaker-avatar">🎭</div>
-                        <div class="beatmaker-info">
-                            <div class="beatmaker-name">
-                                greyrock
-                                <span style="color: var(--text-tertiary);">+</span>
-                            </div>
-                            <div class="beatmaker-stats">113 битов (12 новых битов за 2 нед.)</div>
-                            <div class="beatmaker-meta">
-                                <span>👁 73,802</span>
-                                <span>❤️ 6,594</span>
-                                <span>👥 1,398</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Favorites Section -->
-            <div class="section" id="favoritesSection" style="display: none;">
-                <div class="header">
-                    <h1 class="header-title">Избранное</h1>
-                </div>
-                <div class="empty-state">
-                    <div class="empty-icon">❤️</div>
-                    <div class="empty-text">У вас пока нет избранных битов</div>
-                </div>
-            </div>
-            
-            <!-- Subscriptions Section -->
-            <div class="section" id="subscriptionsSection" style="display: none;">
-                <div class="header">
-                    <h1 class="header-title">Подписки</h1>
-                </div>
-                <div class="empty-state">
-                    <div class="empty-icon">👥</div>
-                    <div class="empty-text">У вас пока нет подписок</div>
-                </div>
-            </div>
-            
-            <!-- Profile Section -->
-            <div class="section" id="profileSection" style="display: none;">
-                <div class="header">
-                    <div class="header-top">
-                        <h1 class="header-title">Профиль</h1>
-                        <a href="#" style="color: var(--accent); text-decoration: none;">💬 Поддержка</a>
-                    </div>
-                </div>
-                
-                <div class="profile-container">
-                    <div class="profile-header">
-                        <div class="profile-avatar">M</div>
-                        <div class="profile-info">
-                            <div class="profile-name">Margar3t</div>
-                            <div class="profile-username">@nnarga3t</div>
-                        </div>
-                        <div class="profile-actions">
-                            <button class="profile-action-btn">🛒</button>
-                        </div>
-                    </div>
-                    
-                    <button class="profile-action-btn" style="width: 100%; margin-bottom: 20px;">
-                        ☰ Меню покупателя
-                    </button>
-                    
-                    <div class="profile-section">
-                        <div class="profile-card">
-                            <div class="profile-card-title">Собираетесь продавать на BeatChain?</div>
-                            <div class="profile-card-text">
-                                Присоединяйтесь к рядам продавцов и выставляйте свои товары!
-                            </div>
-                        </div>
-                        
-                        <div class="profile-action" onclick="showLicenseSetup()">
-                            <div class="action-icon">👤</div>
-                            <div class="action-text">Добавить профиль продавца</div>
-                        </div>
-                        
-                        <div class="profile-action" onclick="showUploadMenu()">
-                            <div class="action-icon">➕</div>
-                            <div class="action-text">Загрузить бит</div>
-                        </div>
-                    </div>
-                    
-                    <div class="tariff-badge">
-                        <div class="tariff-title">Тариф Based</div>
-                        <div class="tariff-desc">Получить больше возможностей</div>
-                    </div>
-                    
-                    <div class="profile-card">
-                        <div class="profile-card-title">Бонусы 🎁</div>
-                        <div class="profile-card-text">Реферальная система и акции</div>
-                    </div>
-                    
-                    <div class="profile-section" style="margin-top: 30px;">
-                        <div class="profile-section-title">История покупок 0</div>
-                        <div class="empty-state" style="padding: 40px 20px;">
-                            <div class="empty-text">У вас пока нет покупок</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- License Setup Section -->
-            <div class="section" id="licenseSection" style="display: none;">
-                <div class="header">
-                    <div class="header-top">
-                        <div class="header-icon" onclick="backFromLicense()">←</div>
-                        <h1 class="header-title">Настройка лицензий</h1>
-                    </div>
-                </div>
-                
-                <div class="license-container">
-                    <div class="license-header">
-                        <div class="license-subtitle">Что вы хотите продавать?</div>
-                    </div>
-                    
-                    <div class="type-selector">
-                        <div class="type-option active">
-                            <div>Биты, киты, услуги</div>
-                        </div>
-                        <div class="type-option">
-                            <div>Услуги, киты</div>
-                        </div>
-                    </div>
-                    
-                    <div class="seller-icon">🎵</div>
-                    
-                    <form>
-                        <div class="form-group">
-                            <label class="form-label">Ник битмейкера</label>
-                            <input type="text" class="form-input" placeholder="Введите ваш ник">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-input" placeholder="example@email.com">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">ФИО</label>
-                            <input type="text" class="form-input" placeholder="Иванов Иван Иванович">
-                        </div>
-                        
-                        <!-- License Options -->
-                        <div class="license-option">
-                            <div class="license-option-header">
-                                <div class="license-option-title">MP3</div>
-                                <div class="toggle active" onclick="toggleSwitch(this)">
-                                    <div class="toggle-handle"></div>
-                                </div>
-                            </div>
-                            <div class="expand-btn" onclick="toggleDetails(this)">
-                                Дополнительные настройки ˅
-                            </div>
-                        </div>
-                        
-                        <div class="license-option">
-                            <div class="license-option-header">
-                                <div class="license-option-title">WAV</div>
-                                <div class="toggle active" onclick="toggleSwitch(this)">
-                                    <div class="toggle-handle"></div>
-                                </div>
-                            </div>
-                            <div class="expand-btn" onclick="toggleDetails(this)">
-                                Дополнительные настройки ˅
-                            </div>
-                        </div>
-                        
-                        <div class="license-option">
-                            <div class="license-option-header">
-                                <div class="license-option-title">TRACK OUT</div>
-                                <div class="toggle active" onclick="toggleSwitch(this)">
-                                    <div class="toggle-handle"></div>
-                                </div>
-                            </div>
-                            <div class="expand-btn" onclick="toggleDetails(this)">
-                                Дополнительные настройки ˅
-                            </div>
-                        </div>
-                        
-                        <div class="license-option">
-                            <div class="license-option-header">
-                                <div class="license-option-title">EXCLUSIVE</div>
-                                <div class="toggle active" onclick="toggleSwitch(this)">
-                                    <div class="toggle-handle"></div>
-                                </div>
-                            </div>
-                            <div class="expand-btn" onclick="toggleDetails(this)">
-                                Дополнительные настройки ˅
-                            </div>
-                            <div class="license-details">
-                                <label class="form-label">Шаблон цены</label>
-                                <input type="number" class="price-input" value="10000">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group" style="margin-top: 30px;">
-                            <label class="form-label">Подпись</label>
-                            <div class="form-label" style="font-size: 12px; margin-bottom: 10px;">Нарисуйте вашу подпись</div>
-                            <textarea class="signature-area" placeholder=""></textarea>
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <button type="button" class="btn btn-secondary">Очистить</button>
-                            <button type="button" class="btn btn-secondary">Сохранить подпись</button>
-                        </div>
-                        
-                        <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
-                            Сохранить настройки
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="showSection('home')">
-                <div class="nav-icon">🏠</div>
-                <div>Главная</div>
-            </div>
-            <div class="nav-item" onclick="showSection('favorites')">
-                <div class="nav-icon">❤️</div>
-                <div>Избранное</div>
-            </div>
-            <div class="nav-item" onclick="showUploadMenu()">
-                <div class="nav-icon">➕</div>
-                <div>Загрузить</div>
-            </div>
-            <div class="nav-item" onclick="showSection('subscriptions')">
-                <div class="nav-icon">👥</div>
-                <div>Подписки</div>
-            </div>
-            <div class="nav-item" onclick="showSection('profile')">
-                <div class="nav-icon">👤</div>
-                <div>Профиль</div>
-            </div>
-        </div>
-        
-        <!-- Upload Menu -->
-        <div class="overlay" id="overlay"></div>
-        <div class="upload-menu" id="uploadMenu">
-            <div class="upload-menu-header">
-                <div class="upload-menu-handle"></div>
-            </div>
-            <div class="upload-option" onclick="showMediaOptions()">
-                <div class="upload-option-icon">➕</div>
-                <div class="upload-option-text">Загрузить один бит</div>
-            </div>
-            <div class="upload-option">
-                <div class="upload-option-icon">📁</div>
-                <div class="upload-option-text">Массовая загрузка</div>
-            </div>
-            <div class="upload-option">
-                <div class="upload-option-icon">🛍️</div>
-                <div class="upload-option-text">Загрузить кит</div>
-            </div>
-            <div class="upload-option">
-                <div class="upload-option-icon">💼</div>
-                <div class="upload-option-text">Менеджер услуг</div>
-            </div>
-            <div class="upload-option">
-                <div class="upload-option-icon">📄</div>
-                <div class="upload-option-text">Черновики</div>
-            </div>
-        </div>
-        
-        <!-- Media Options -->
-        <div class="media-options" id="mediaOptions">
-            <div class="media-option">
-                <div class="upload-option-icon">🖼️</div>
-                <div class="upload-option-text">Медиатека</div>
-            </div>
-            <div class="media-option">
-                <div class="upload-option-icon">📷</div>
-                <div class="upload-option-text">Сделать снимок</div>
-            </div>
-            <div class="media-option">
-                <div class="upload-option-icon">📁</div>
-                <div class="upload-option-text">Выбрать файл</div>
-            </div>
-        </div>
-    </div>
 
     <script>
         // Initialize Telegram Web App
@@ -1346,62 +1339,163 @@
             tg = window.Telegram.WebApp;
             tg.ready();
             tg.expand();
-            
-            // Prevent viewport changes
-            const viewport = document.querySelector('meta[name="viewport"]');
-            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
         } catch (e) {
             console.log('Running outside Telegram');
         }
         
-        // State
-        let currentSection = 'home';
-        let currentFilter = 'all';
+        // App State
+        const appState = {
+            currentPage: 'home',
+            currentFilter: 'all',
+            uploadMenuOpen: false,
+            favorites: [],
+            cart: [],
+            userProfile: {
+                name: 'Margar3t',
+                username: '@nnarga3t',
+                avatar: 'M'
+            }
+        };
+        
+        // Sample Data
+        const beatsData = [
+            {
+                id: 1,
+                title: 'DOUBLE FACE',
+                artist: 'senpai⭐',
+                featuring: true,
+                bpm: 186,
+                key: 'F#min',
+                price: 1000,
+                tags: ['#youngmoney', '#2010s', '#timl'],
+                coverGradient: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+                downloads: true
+            },
+            {
+                id: 2,
+                title: 'privet',
+                artist: 'plus37',
+                verified: true,
+                bpm: 187,
+                key: 'F#maj',
+                price: 500,
+                tags: ['#digicore', '#archivecore', '#jerk'],
+                coverGradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                hasGuitar: true
+            },
+            {
+                id: 3,
+                title: '(164) K1SC @...',
+                artist: 'sizeXL',
+                verified: true,
+                bpm: 102,
+                key: 'Cmin',
+                price: 2000,
+                tags: ['#vocal', '#sample', '#swaga'],
+                coverGradient: 'linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%)'
+            },
+            {
+                id: 4,
+                title: 'ear',
+                artist: 'fuyomoprod',
+                featuring: true,
+                bpm: 111,
+                key: 'F#min',
+                price: 1500,
+                tags: ['#experimental', '#cl6udly', '#am'],
+                coverGradient: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)'
+            }
+        ];
+        
+        const beatmakersData = [
+            {
+                id: 1,
+                rank: 1,
+                name: 'greyrock',
+                avatar: '🎭',
+                beats: 113,
+                newBeats: 12,
+                views: 73802,
+                likes: 6594,
+                followers: 1398,
+                featured: {
+                    title: 'oxx',
+                    bpm: 135,
+                    key: 'Gmin',
+                    tags: ['#junoes']
+                }
+            },
+            {
+                id: 2,
+                rank: 2,
+                name: 'fumiko!',
+                avatar: '😈',
+                beats: 93,
+                newBeats: 10,
+                views: 20878,
+                likes: 4148,
+                followers: 334,
+                featured: {
+                    title: 'formanta ykykyk',
+                    bpm: 161,
+                    tags: ['#fumiko']
+                }
+            }
+        ];
         
         // Hide splash screen
         setTimeout(() => {
-            document.getElementById('splash').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('splash').style.display = 'none';
-            }, 500);
+            const splash = document.getElementById('splash');
+            splash.style.opacity = '0';
+            setTimeout(() => splash.style.display = 'none', 500);
         }, 1500);
         
-        // Navigation
-        function showSection(section) {
-            // Hide all sections
-            document.querySelectorAll('.section').forEach(s => {
-                s.style.display = 'none';
-            });
+        // Page Navigation
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(page + 'Page').classList.add('active');
             
-            // Show selected section
-            document.getElementById(section + 'Section').style.display = 'block';
-            
-            // Update nav
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             event.currentTarget.classList.add('active');
             
-            currentSection = section;
-            
-            // Close menus
-            hideUploadMenu();
-            hideMediaOptions();
+            appState.currentPage = page;
             
             if (tg && tg.HapticFeedback) {
                 tg.HapticFeedback.impactOccurred('light');
             }
         }
         
-        // Tabs
+        // Tab Filtering
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
-                currentFilter = this.dataset.filter;
                 
-                // Filter content based on tab
-                filterContent(currentFilter);
+                const filter = this.dataset.filter;
+                appState.currentFilter = filter;
+                
+                // Update content based on filter
+                if (filter === 'all') {
+                    document.getElementById('beatsList').style.display = 'block';
+                    document.getElementById('beatsGrid').style.display = 'grid';
+                    document.getElementById('beatmakersSection').style.display = 'block';
+                    document.getElementById('newSection').style.display = 'none';
+                } else if (filter === 'beats') {
+                    document.getElementById('beatsList').style.display = 'block';
+                    document.getElementById('beatsGrid').style.display = 'none';
+                    document.getElementById('beatmakersSection').style.display = 'none';
+                    document.getElementById('newSection').style.display = 'none';
+                } else if (filter === 'beatmakers') {
+                    document.getElementById('beatsList').style.display = 'none';
+                    document.getElementById('beatsGrid').style.display = 'none';
+                    document.getElementById('beatmakersSection').style.display = 'block';
+                    document.getElementById('newSection').style.display = 'none';
+                } else {
+                    document.getElementById('beatsList').style.display = 'none';
+                    document.getElementById('beatsGrid').style.display = 'none';
+                    document.getElementById('beatmakersSection').style.display = 'none';
+                    document.getElementById('newSection').style.display = 'block';
+                }
                 
                 if (tg && tg.HapticFeedback) {
                     tg.HapticFeedback.impactOccurred('light');
@@ -1409,78 +1503,178 @@
             });
         });
         
-        function filterContent(filter) {
-            const beatsSection = document.getElementById('popularBeats');
-            const beatmakersSection = document.getElementById('popularBeatmakers');
+        // Render Beats
+        function renderBeats() {
+            const beatsList = document.getElementById('beatsList');
+            beatsList.innerHTML = beatsData.slice(0, 2).map(beat => `
+                <div class="beat-card" onclick="openBeat(${beat.id})">
+                    <div class="beat-cover" style="background: ${beat.coverGradient};">
+                        <div class="beat-play-btn">▶</div>
+                    </div>
+                    <div class="beat-info">
+                        <div class="beat-title">
+                            ${beat.title}
+                            <div class="beat-badges">
+                                ${beat.downloads ? '<span class="beat-badge">⬇</span>' : ''}
+                                ${beat.hasGuitar ? '<span class="beat-badge">🎸</span>' : ''}
+                                <span class="beat-badge">${beat.artist}</span>
+                                ${beat.featuring ? '<span class="beat-badge">+</span>' : ''}
+                                ${beat.verified ? '<span class="beat-badge verified">✓</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="beat-meta">
+                            <span>${beat.bpm} BPM</span>
+                            <span>•</span>
+                            <span>${beat.key}</span>
+                            <span>•</span>
+                            <span>от ${beat.price} ₽</span>
+                        </div>
+                        <div class="beat-tags">
+                            ${beat.tags.map(tag => `<span class="beat-tag">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="beat-like ${appState.favorites.includes(beat.id) ? 'liked' : ''}" onclick="toggleLike(event, ${beat.id})">
+                        ${appState.favorites.includes(beat.id) ? '❤️' : '🤍'}
+                    </div>
+                </div>
+            `).join('');
             
-            switch(filter) {
-                case 'all':
-                    beatsSection.style.display = 'block';
-                    beatmakersSection.style.display = 'block';
-                    break;
-                case 'beats':
-                    beatsSection.style.display = 'block';
-                    beatmakersSection.style.display = 'none';
-                    break;
-                case 'beatmakers':
-                    beatsSection.style.display = 'none';
-                    beatmakersSection.style.display = 'block';
-                    break;
-                default:
-                    beatsSection.style.display = 'none';
-                    beatmakersSection.style.display = 'none';
-            }
+            // Render grid beats
+            const beatsGrid = document.getElementById('beatsGrid');
+            beatsGrid.innerHTML = beatsData.slice(2).map(beat => `
+                <div class="beat-grid-item" onclick="openBeat(${beat.id})">
+                    <div class="beat-grid-cover" style="background: ${beat.coverGradient};">
+                        <div class="beat-grid-play">▶</div>
+                    </div>
+                    <div class="beat-grid-info">
+                        <div class="beat-grid-title">${beat.title}</div>
+                        <div class="beat-grid-artist">${beat.artist}</div>
+                    </div>
+                </div>
+            `).join('');
         }
         
-        // Upload Menu
-        function showUploadMenu() {
-            document.getElementById('overlay').classList.add('active');
-            document.getElementById('uploadMenu').classList.add('active');
+        // Render Beatmakers
+        function renderBeatmakers() {
+            const beatmakersList = document.getElementById('beatmakersList');
+            beatmakersList.innerHTML = beatmakersData.map(bm => `
+                <div class="beatmaker-card" onclick="openBeatmaker(${bm.id})">
+                    ${bm.rank <= 3 ? `<div class="beatmaker-rank">#${bm.rank}</div>` : ''}
+                    <div class="beatmaker-content">
+                        <div class="beatmaker-avatar">${bm.avatar}</div>
+                        <div class="beatmaker-info">
+                            <div class="beatmaker-name">
+                                ${bm.name}
+                                <span style="color: var(--text-tertiary);">+</span>
+                            </div>
+                            <div class="beatmaker-stats">${bm.beats} битов (${bm.newBeats} новых битов за 2 нед.)</div>
+                            <div class="beatmaker-metrics">
+                                <span class="beatmaker-metric">👁 ${bm.views.toLocaleString()}</span>
+                                <span class="beatmaker-metric">❤️ ${bm.likes.toLocaleString()}</span>
+                                <span class="beatmaker-metric">👥 ${bm.followers.toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="beatmaker-featured">
+                        <div class="beatmaker-beat">
+                            <div class="beatmaker-beat-cover">▶</div>
+                            <div class="beatmaker-beat-info">
+                                <div class="beatmaker-beat-title">${bm.featured.title}</div>
+                                <div class="beatmaker-beat-meta">
+                                    ${bm.featured.bpm ? `${bm.featured.bpm} BPM • ` : ''}
+                                    ${bm.featured.key || ''}
+                                </div>
+                                <div class="beat-tags">
+                                    ${bm.featured.tags.map(tag => `<span class="beat-tag">${tag}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="beatmaker-more">Больше битов →</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Toggle Like
+        function toggleLike(event, beatId) {
+            event.stopPropagation();
+            
+            const index = appState.favorites.indexOf(beatId);
+            if (index > -1) {
+                appState.favorites.splice(index, 1);
+            } else {
+                appState.favorites.push(beatId);
+            }
+            
+            renderBeats();
             
             if (tg && tg.HapticFeedback) {
                 tg.HapticFeedback.impactOccurred('medium');
             }
         }
         
-        function hideUploadMenu() {
-            document.getElementById('overlay').classList.remove('active');
-            document.getElementById('uploadMenu').classList.remove('active');
-            hideMediaOptions();
-        }
-        
-        // Media Options
-        function showMediaOptions() {
-            document.getElementById('mediaOptions').classList.add('active');
+        // Upload Menu
+        function toggleUploadMenu() {
+            const overlay = document.getElementById('overlay');
+            const menu = document.getElementById('uploadMenu');
+            
+            if (appState.uploadMenuOpen) {
+                overlay.classList.remove('active');
+                menu.classList.remove('active');
+                appState.uploadMenuOpen = false;
+            } else {
+                overlay.classList.add('active');
+                menu.classList.add('active');
+                appState.uploadMenuOpen = true;
+            }
             
             if (tg && tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('light');
+                tg.HapticFeedback.impactOccurred('medium');
             }
         }
         
-        function hideMediaOptions() {
-            document.getElementById('mediaOptions').classList.remove('active');
+        function selectUploadOption(type) {
+            toggleUploadMenu();
+            
+            // Here you would handle different upload types
+            console.log('Selected upload type:', type);
+            
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred('success');
+            }
         }
         
         // License Setup
         function showLicenseSetup() {
-            document.getElementById('profileSection').style.display = 'none';
-            document.getElementById('licenseSection').style.display = 'block';
+            document.getElementById('profilePage').classList.remove('active');
+            document.getElementById('licensePage').classList.add('active');
             
             if (tg && tg.HapticFeedback) {
                 tg.HapticFeedback.impactOccurred('light');
             }
         }
         
-        function backFromLicense() {
-            document.getElementById('licenseSection').style.display = 'none';
-            document.getElementById('profileSection').style.display = 'block';
+        function closeLicenseSetup() {
+            document.getElementById('licensePage').classList.remove('active');
+            document.getElementById('profilePage').classList.add('active');
             
             if (tg && tg.HapticFeedback) {
                 tg.HapticFeedback.impactOccurred('light');
             }
         }
         
-        // Toggle Switch
+        function selectType(element, type) {
+            document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('active'));
+            element.classList.add('active');
+            
+            const avatar = document.getElementById('sellerAvatar');
+            avatar.textContent = type === 'beats' ? '🎵' : '📷';
+            
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+        }
+        
         function toggleSwitch(element) {
             element.classList.toggle('active');
             
@@ -1489,82 +1683,29 @@
             }
         }
         
-        // Toggle Details
-        function toggleDetails(element) {
-            const details = element.parentElement.querySelector('.license-details');
-            if (details) {
-                details.classList.toggle('active');
-                element.textContent = details.classList.contains('active') ? 
-                    'Дополнительные настройки ˄' : 'Дополнительные настройки ˅';
+        // Open Beat/Beatmaker
+        function openBeat(beatId) {
+            console.log('Open beat:', beatId);
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
             }
         }
         
-        // Type Options
-        document.querySelectorAll('.type-option').forEach(option => {
-            option.addEventListener('click', function() {
-                document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Change icon based on selection
-                const icon = document.querySelector('.seller-icon');
-                icon.textContent = this.textContent.includes('услуги') ? '📷' : '🎵';
-                
-                if (tg && tg.HapticFeedback) {
-                    tg.HapticFeedback.impactOccurred('light');
-                }
-            });
-        });
+        function openBeatmaker(beatmakerId) {
+            console.log('Open beatmaker:', beatmakerId);
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+        }
         
-        // Overlay click
-        document.getElementById('overlay').addEventListener('click', hideUploadMenu);
+        // Initialize
+        renderBeats();
+        renderBeatmakers();
         
-        // Prevent scroll when menus are open
-        document.getElementById('uploadMenu').addEventListener('touchmove', (e) => {
-            e.stopPropagation();
-        });
-        
-        // Search
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            // Implement search functionality
-            console.log('Searching for:', e.target.value);
-        });
-        
-        // Like buttons
-        document.querySelectorAll('.beat-like').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                this.textContent = this.textContent === '🤍' ? '❤️' : '🤍';
-                this.classList.toggle('active');
-                
-                if (tg && tg.HapticFeedback) {
-                    tg.HapticFeedback.impactOccurred('light');
-                }
-            });
-        });
-        
-        // Telegram theme
+        // Setup Telegram theme
         if (tg && tg.themeParams) {
-            const root = document.documentElement;
             // Apply theme colors if needed
         }
-        
-        // Prevent pull-to-refresh
-        let lastY = 0;
-        document.addEventListener('touchstart', function(e) {
-            lastY = e.touches[0].clientY;
-        }, { passive: false });
-        
-        document.addEventListener('touchmove', function(e) {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const currentY = e.touches[0].clientY;
-            const direction = currentY > lastY ? 'down' : 'up';
-            
-            if (scrollTop === 0 && direction === 'down') {
-                e.preventDefault();
-            }
-            
-            lastY = currentY;
-        }, { passive: false });
         
         console.log('BeatChain initialized');
     </script>
